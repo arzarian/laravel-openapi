@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DummyNamespace;
 
 use Vyuldashev\LaravelOpenApi\Builders\Callback;
@@ -13,7 +15,7 @@ use Vyuldashev\LaravelOpenApi\Factories\CallbackFactory;
 
 class DummyClass extends CallbackFactory
 {
-    public function build()
+    public function build(): Callback
     {
         return Callback::create('MyEvent')
             ->expression(

@@ -6,6 +6,17 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\SecurityScheme as SwaggerSecurityScheme;
 
+/**
+ * @property-read ?string $securityScheme
+ * @property-read ?string $type
+ * @property-read ?string $description
+ * @property-read ?string $name
+ * @property-read ?string $in
+ * @property-read ?string $scheme
+ * @property-read ?string $bearerFormat
+ * @property-read list<OAuthFlow> $flows
+ * @property-read ?string $openIdConnectUrl
+ */
 class SecurityScheme extends SpecificationBuilder
 {
     public const string TYPE_API_KEY = 'apiKey';
@@ -52,7 +63,7 @@ class SecurityScheme extends SpecificationBuilder
         return $this->set('bearerFormat', $bearerFormat);
     }
 
-    public function flows(mixed ...$flows): static
+    public function flows(OAuthFlow ...$flows): static
     {
         return $this->set('flows', $flows ?: null);
     }

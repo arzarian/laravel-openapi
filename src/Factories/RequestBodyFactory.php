@@ -13,10 +13,7 @@ abstract class RequestBodyFactory
         ref as protected makeRef;
     }
 
-    /**
-     * @return RequestBodyBuilder|\OpenApi\Annotations\RequestBody|array<string, mixed>
-     */
-    abstract public function build();
+    abstract public function build(): RequestBodyBuilder;
 
     public static function ref(?string $objectId = null): RequestBodyBuilder
     {

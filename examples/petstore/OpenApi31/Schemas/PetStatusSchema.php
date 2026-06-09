@@ -10,7 +10,7 @@ use Vyuldashev\LaravelOpenApi\Factories\SchemaFactory;
 
 class PetStatusSchema extends SchemaFactory implements Reusable
 {
-    public function build()
+    public function build(): Schema
     {
         return Schema::object('PetStatus')->properties(
             Schema::string('kind')->const('pet'),

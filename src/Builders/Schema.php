@@ -6,6 +6,44 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Schema as SwaggerSchema;
 
+/**
+ * @property-read ?string $schema
+ * @property-read ?string $title
+ * @property-read ?string $description
+ * @property-read list<mixed> $enum
+ * @property-read mixed $default
+ * @property-read ?string $format
+ * @property-read string|list<string>|null $type
+ * @property-read mixed $const
+ * @property-read ?Schema $items
+ * @property-read ?int $maxItems
+ * @property-read ?int $minItems
+ * @property-read ?bool $uniqueItems
+ * @property-read ?string $pattern
+ * @property-read ?int $maxLength
+ * @property-read ?int $minLength
+ * @property-read int|float|null $maximum
+ * @property-read int|float|bool|null $exclusiveMaximum
+ * @property-read int|float|null $minimum
+ * @property-read int|float|bool|null $exclusiveMinimum
+ * @property-read int|float|null $multipleOf
+ * @property-read list<string|null> $required
+ * @property-read list<Schema> $allOf
+ * @property-read list<Schema> $anyOf
+ * @property-read list<Schema> $oneOf
+ * @property-read ?Schema $not
+ * @property-read bool|Schema|null $additionalProperties
+ * @property-read ?int $maxProperties
+ * @property-read ?int $minProperties
+ * @property-read ?bool $nullable
+ * @property-read ?Discriminator $discriminator
+ * @property-read ?bool $readOnly
+ * @property-read ?bool $writeOnly
+ * @property-read ?Xml $xml
+ * @property-read ?ExternalDocs $externalDocs
+ * @property-read mixed $example
+ * @property-read ?bool $deprecated
+ */
 class Schema extends SpecificationBuilder
 {
     public const string TYPE_ARRAY = 'array';
@@ -104,7 +142,7 @@ class Schema extends SpecificationBuilder
         return $this->set('const', $value);
     }
 
-    public function items(mixed $items): static
+    public function items(Schema $items): static
     {
         return $this->set('items', $items);
     }
@@ -164,42 +202,42 @@ class Schema extends SpecificationBuilder
         return $this->set('multipleOf', $multipleOf);
     }
 
-    public function required(mixed ...$required): static
+    public function required(string|Schema ...$required): static
     {
         $required = \array_map(
-            static fn(mixed $item): mixed => $item instanceof self ? $item->objectId : $item,
+            static fn(string|Schema $item): ?string => $item instanceof self ? $item->objectId : $item,
             $required,
         );
 
         return $this->set('required', $required ?: null);
     }
 
-    public function properties(mixed ...$properties): static
+    public function properties(Schema ...$properties): static
     {
         return $this->set('properties', $properties ?: null);
     }
 
-    public function allOf(mixed ...$schemas): static
+    public function allOf(Schema ...$schemas): static
     {
         return $this->set('allOf', $schemas ?: null);
     }
 
-    public function anyOf(mixed ...$schemas): static
+    public function anyOf(Schema ...$schemas): static
     {
         return $this->set('anyOf', $schemas ?: null);
     }
 
-    public function oneOf(mixed ...$schemas): static
+    public function oneOf(Schema ...$schemas): static
     {
         return $this->set('oneOf', $schemas ?: null);
     }
 
-    public function not(mixed $schema): static
+    public function not(Schema $schema): static
     {
         return $this->set('not', $schema);
     }
 
-    public function additionalProperties(mixed $additionalProperties): static
+    public function additionalProperties(bool|Schema $additionalProperties): static
     {
         return $this->set('additionalProperties', $additionalProperties);
     }
@@ -219,7 +257,7 @@ class Schema extends SpecificationBuilder
         return $this->set('nullable', $nullable);
     }
 
-    public function discriminator(mixed $discriminator): static
+    public function discriminator(Discriminator $discriminator): static
     {
         return $this->set('discriminator', $discriminator);
     }
@@ -234,12 +272,12 @@ class Schema extends SpecificationBuilder
         return $this->set('writeOnly', $writeOnly);
     }
 
-    public function xml(mixed $xml): static
+    public function xml(Xml $xml): static
     {
         return $this->set('xml', $xml);
     }
 
-    public function externalDocs(mixed $externalDocs): static
+    public function externalDocs(ExternalDocs $externalDocs): static
     {
         return $this->set('externalDocs', $externalDocs);
     }

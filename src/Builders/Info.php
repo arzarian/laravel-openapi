@@ -6,6 +6,14 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Info as SwaggerInfo;
 
+/**
+ * @property-read ?string $title
+ * @property-read ?string $description
+ * @property-read ?string $termsOfService
+ * @property-read ?Contact $contact
+ * @property-read ?License $license
+ * @property-read ?string $version
+ */
 class Info extends SpecificationBuilder
 {
     public function title(?string $title): static
@@ -23,12 +31,12 @@ class Info extends SpecificationBuilder
         return $this->set('termsOfService', $termsOfService);
     }
 
-    public function contact(mixed $contact): static
+    public function contact(Contact $contact): static
     {
         return $this->set('contact', $contact);
     }
 
-    public function license(mixed $license): static
+    public function license(License $license): static
     {
         return $this->set('license', $license);
     }

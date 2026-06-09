@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DummyNamespace;
 
 use Vyuldashev\LaravelOpenApi\Builders\Response;
@@ -7,7 +9,7 @@ use Vyuldashev\LaravelOpenApi\Factories\ResponseFactory;
 
 class DummyClass extends ResponseFactory
 {
-    public function build()
+    public function build(): Response
     {
         return Response::create('DummyResponse')
             ->description('Successful response');

@@ -167,6 +167,28 @@ class SpecificationBuildersTest extends TestCase
             ->toArray());
     }
 
+    public function testSchemaItemsRejectsRawArrays(): void
+    {
+        // Verifies schema nesting accepts project builders, not raw arrays.
+        /** @var mixed $rawSchema */
+        $rawSchema = ['type' => 'string'];
+
+        $this->expectException(\TypeError::class);
+
+        Schema::array()->items($rawSchema);
+    }
+
+    public function testSchemaItemsRejectsSwaggerAnnotations(): void
+    {
+        // Verifies schema nesting is not coupled to swagger-php annotation types.
+        /** @var mixed $swaggerSchema */
+        $swaggerSchema = new SwaggerSchema(['type' => 'string']);
+
+        $this->expectException(\TypeError::class);
+
+        Schema::array()->items($swaggerSchema);
+    }
+
     public function testNonSchemaRefsStayPureReferences(): void
     {
         self::assertSame([
@@ -788,7 +810,7 @@ class SpecificationBuildersTest extends TestCase
 
 class FakeBuilderSchema extends SchemaFactory implements Reusable
 {
-    public function build()
+    public function build(): Schema
     {
         return Schema::object('Pet');
     }
@@ -796,7 +818,7 @@ class FakeBuilderSchema extends SchemaFactory implements Reusable
 
 class FakeBuilderResponse extends ResponseFactory implements Reusable
 {
-    public function build()
+    public function build(): Response
     {
         return Response::create('ErrorValidation')->description('Validation error');
     }

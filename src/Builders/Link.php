@@ -6,6 +6,15 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Link as SwaggerLink;
 
+/**
+ * @property-read ?string $link
+ * @property-read ?string $operationRef
+ * @property-read ?string $operationId
+ * @property-read array<string, mixed> $parameters
+ * @property-read mixed $requestBody
+ * @property-read ?string $description
+ * @property-read ?Server $server
+ */
 class Link extends SpecificationBuilder
 {
     public function operationRef(?string $operationRef): static
@@ -36,7 +45,7 @@ class Link extends SpecificationBuilder
         return $this->set('description', $description);
     }
 
-    public function server(mixed $server): static
+    public function server(Server $server): static
     {
         return $this->set('server', $server);
     }

@@ -6,7 +6,7 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 class Not extends Schema
 {
-    public static function schema(mixed $schema): static
+    public static function schema(Schema $schema): static
     {
         return static::create()->set('not', $schema);
     }

@@ -6,6 +6,13 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Flow;
 
+/**
+ * @property-read ?string $flow
+ * @property-read ?string $authorizationUrl
+ * @property-read ?string $tokenUrl
+ * @property-read ?string $refreshUrl
+ * @property-read array<string, string> $scopes
+ */
 class OAuthFlow extends SpecificationBuilder
 {
     public const string FLOW_IMPLICIT = 'implicit';

@@ -6,6 +6,11 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Tag as SwaggerTag;
 
+/**
+ * @property-read ?string $name
+ * @property-read ?string $description
+ * @property-read ?ExternalDocs $externalDocs
+ */
 class Tag extends SpecificationBuilder
 {
     public function name(?string $name): static
@@ -18,7 +23,7 @@ class Tag extends SpecificationBuilder
         return $this->set('description', $description);
     }
 
-    public function externalDocs(mixed $externalDocs): static
+    public function externalDocs(ExternalDocs $externalDocs): static
     {
         return $this->set('externalDocs', $externalDocs);
     }

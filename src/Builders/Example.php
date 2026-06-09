@@ -6,6 +6,13 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Examples;
 
+/**
+ * @property-read ?string $example
+ * @property-read ?string $summary
+ * @property-read ?string $description
+ * @property-read mixed $value
+ * @property-read ?string $externalValue
+ */
 class Example extends SpecificationBuilder
 {
     public function summary(?string $summary): static

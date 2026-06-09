@@ -13,10 +13,7 @@ abstract class ParameterFactory
         ref as protected makeRef;
     }
 
-    /**
-     * @return ParameterBuilder|\OpenApi\Annotations\Parameter|array<string, mixed>
-     */
-    abstract public function build();
+    abstract public function build(): ParameterBuilder;
 
     public static function ref(?string $objectId = null): ParameterBuilder
     {

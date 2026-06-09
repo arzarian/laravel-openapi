@@ -6,6 +6,12 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\RequestBody as SwaggerRequestBody;
 
+/**
+ * @property-read ?string $request
+ * @property-read ?string $description
+ * @property-read list<MediaType> $content
+ * @property-read ?bool $required
+ */
 class RequestBody extends SpecificationBuilder
 {
     public function description(?string $description): static
@@ -13,7 +19,7 @@ class RequestBody extends SpecificationBuilder
         return $this->set('description', $description);
     }
 
-    public function content(mixed ...$content): static
+    public function content(MediaType ...$content): static
     {
         return $this->set('content', $content ?: null);
     }

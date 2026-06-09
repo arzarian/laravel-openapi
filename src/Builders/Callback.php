@@ -6,6 +6,10 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Attachable;
 
+/**
+ * @property-read ?string $name
+ * @property-read array<string, PathItem> $callbacks
+ */
 class Callback extends SpecificationBuilder
 {
     public function name(?string $name): static
@@ -13,7 +17,7 @@ class Callback extends SpecificationBuilder
         return $this->withObjectId($name);
     }
 
-    public function expression(string $expression, mixed $pathItem): static
+    public function expression(string $expression, PathItem $pathItem): static
     {
         $callbacks = $this->properties['callbacks'] ?? [];
         $callbacks[$expression] = $pathItem;

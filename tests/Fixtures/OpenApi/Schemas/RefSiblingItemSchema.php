@@ -10,7 +10,7 @@ use Vyuldashev\LaravelOpenApi\Factories\SchemaFactory;
 
 class RefSiblingItemSchema extends SchemaFactory implements Reusable
 {
-    public function build()
+    public function build(): Schema
     {
         return Schema::object('RefSiblingItem')->properties(
             Schema::string('name'),

@@ -6,44 +6,60 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\PathItem as SwaggerPathItem;
 
+/**
+ * @property-read ?Operation $get
+ * @property-read ?Operation $post
+ * @property-read ?Operation $put
+ * @property-read ?Operation $patch
+ * @property-read ?Operation $delete
+ * @property-read ?Operation $options
+ * @property-read ?Operation $head
+ * @property-read ?Operation $trace
+ * @property-read ?string $path
+ * @property-read ?string $summary
+ * @property-read ?string $description
+ * @property-read list<Operation> $operations
+ * @property-read list<Server> $servers
+ * @property-read list<Parameter> $parameters
+ */
 class PathItem extends SpecificationBuilder
 {
-    public function get(mixed $operation): static
+    public function get(Operation $operation): static
     {
         return $this->set('get', $operation);
     }
 
-    public function post(mixed $operation): static
+    public function post(Operation $operation): static
     {
         return $this->set('post', $operation);
     }
 
-    public function put(mixed $operation): static
+    public function put(Operation $operation): static
     {
         return $this->set('put', $operation);
     }
 
-    public function patch(mixed $operation): static
+    public function patch(Operation $operation): static
     {
         return $this->set('patch', $operation);
     }
 
-    public function delete(mixed $operation): static
+    public function delete(Operation $operation): static
     {
         return $this->set('delete', $operation);
     }
 
-    public function options(mixed $operation): static
+    public function options(Operation $operation): static
     {
         return $this->set('options', $operation);
     }
 
-    public function head(mixed $operation): static
+    public function head(Operation $operation): static
     {
         return $this->set('head', $operation);
     }
 
-    public function trace(mixed $operation): static
+    public function trace(Operation $operation): static
     {
         return $this->set('trace', $operation);
     }
@@ -63,17 +79,17 @@ class PathItem extends SpecificationBuilder
         return $this->set('description', $description);
     }
 
-    public function operations(mixed ...$operations): static
+    public function operations(Operation ...$operations): static
     {
         return $this->set('operations', $operations ?: null);
     }
 
-    public function servers(mixed ...$servers): static
+    public function servers(Server ...$servers): static
     {
         return $this->set('servers', $servers ?: null);
     }
 
-    public function parameters(mixed ...$parameters): static
+    public function parameters(Parameter ...$parameters): static
     {
         return $this->set('parameters', $parameters ?: null);
     }

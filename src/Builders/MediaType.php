@@ -6,6 +6,13 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\MediaType as SwaggerMediaType;
 
+/**
+ * @property-read ?string $mediaType
+ * @property-read ?Schema $schema
+ * @property-read mixed $example
+ * @property-read list<Example> $examples
+ * @property-read list<Encoding> $encoding
+ */
 class MediaType extends SpecificationBuilder
 {
     public const string MEDIA_TYPE_APPLICATION_JSON = 'application/json';
@@ -62,7 +69,7 @@ class MediaType extends SpecificationBuilder
         return $this->set('mediaType', $mediaType);
     }
 
-    public function schema(mixed $schema): static
+    public function schema(Schema $schema): static
     {
         return $this->set('schema', $schema);
     }
@@ -72,12 +79,12 @@ class MediaType extends SpecificationBuilder
         return $this->set('example', $example);
     }
 
-    public function examples(mixed ...$examples): static
+    public function examples(Example ...$examples): static
     {
         return $this->set('examples', $examples ?: null);
     }
 
-    public function encoding(mixed ...$encoding): static
+    public function encoding(Encoding ...$encoding): static
     {
         return $this->set('encoding', $encoding ?: null);
     }

@@ -14,6 +14,21 @@ use OpenApi\Annotations\Post;
 use OpenApi\Annotations\Put;
 use OpenApi\Annotations\Trace;
 
+/**
+ * @property-read ?string $method
+ * @property-read ?string $summary
+ * @property-read ?string $description
+ * @property-read list<string> $tags
+ * @property-read ?ExternalDocs $externalDocs
+ * @property-read ?string $operationId
+ * @property-read ?bool $deprecated
+ * @property-read list<Parameter> $parameters
+ * @property-read ?RequestBody $requestBody
+ * @property-read list<Response> $responses
+ * @property-read list<Callback> $callbacks
+ * @property-read list<array<string, mixed>> $security
+ * @property-read list<Server> $servers
+ */
 class Operation extends SpecificationBuilder
 {
     protected ?string $method = null;
@@ -96,7 +111,7 @@ class Operation extends SpecificationBuilder
         return $this->set('tags', $tags ?: null);
     }
 
-    public function externalDocs(mixed $externalDocs): static
+    public function externalDocs(ExternalDocs $externalDocs): static
     {
         return $this->set('externalDocs', $externalDocs);
     }
@@ -111,22 +126,22 @@ class Operation extends SpecificationBuilder
         return $this->set('deprecated', $deprecated);
     }
 
-    public function parameters(mixed ...$parameters): static
+    public function parameters(Parameter ...$parameters): static
     {
         return $this->set('parameters', $parameters ?: null);
     }
 
-    public function requestBody(mixed $requestBody): static
+    public function requestBody(RequestBody $requestBody): static
     {
         return $this->set('requestBody', $requestBody);
     }
 
-    public function responses(mixed ...$responses): static
+    public function responses(Response ...$responses): static
     {
         return $this->set('responses', $responses ?: null);
     }
 
-    public function callbacks(mixed ...$callbacks): static
+    public function callbacks(Callback ...$callbacks): static
     {
         return $this->set('callbacks', $callbacks ?: null);
     }
@@ -144,7 +159,7 @@ class Operation extends SpecificationBuilder
         return $this->set('security', [[]]);
     }
 
-    public function servers(mixed ...$servers): static
+    public function servers(Server ...$servers): static
     {
         return $this->set('servers', $servers ?: null);
     }

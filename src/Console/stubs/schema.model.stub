@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DummyNamespace;
 
 use Vyuldashev\LaravelOpenApi\Builders\Schema;
@@ -7,7 +9,7 @@ use Vyuldashev\LaravelOpenApi\Factories\SchemaFactory;
 
 class DummyClass extends SchemaFactory
 {
-    public function build()
+    public function build(): Schema
     {
         DummyDefinition;
     }

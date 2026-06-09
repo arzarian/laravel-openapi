@@ -13,10 +13,7 @@ abstract class SchemaFactory
         ref as protected makeRef;
     }
 
-    /**
-     * @return SchemaBuilder|\OpenApi\Annotations\Schema|array<string, mixed>
-     */
-    abstract public function build();
+    abstract public function build(): SchemaBuilder;
 
     public static function ref(?string $objectId = null): SchemaBuilder
     {

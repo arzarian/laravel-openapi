@@ -6,49 +6,60 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Components as SwaggerComponents;
 
+/**
+ * @property-read list<Schema> $schemas
+ * @property-read list<Response> $responses
+ * @property-read list<Parameter> $parameters
+ * @property-read list<Example> $examples
+ * @property-read list<RequestBody> $requestBodies
+ * @property-read list<Header> $headers
+ * @property-read list<SecurityScheme> $securitySchemes
+ * @property-read list<Link> $links
+ * @property-read list<Callback> $callbacks
+ */
 class Components extends SpecificationBuilder
 {
-    public function schemas(mixed ...$schemas): static
+    public function schemas(Schema ...$schemas): static
     {
         return $this->set('schemas', $schemas ?: null);
     }
 
-    public function responses(mixed ...$responses): static
+    public function responses(Response ...$responses): static
     {
         return $this->set('responses', $responses ?: null);
     }
 
-    public function parameters(mixed ...$parameters): static
+    public function parameters(Parameter ...$parameters): static
     {
         return $this->set('parameters', $parameters ?: null);
     }
 
-    public function examples(mixed ...$examples): static
+    public function examples(Example ...$examples): static
     {
         return $this->set('examples', $examples ?: null);
     }
 
-    public function requestBodies(mixed ...$requestBodies): static
+    public function requestBodies(RequestBody ...$requestBodies): static
     {
         return $this->set('requestBodies', $requestBodies ?: null);
     }
 
-    public function headers(mixed ...$headers): static
+    public function headers(Header ...$headers): static
     {
         return $this->set('headers', $headers ?: null);
     }
 
-    public function securitySchemes(mixed ...$securitySchemes): static
+    public function securitySchemes(SecurityScheme ...$securitySchemes): static
     {
         return $this->set('securitySchemes', $securitySchemes ?: null);
     }
 
-    public function links(mixed ...$links): static
+    public function links(Link ...$links): static
     {
         return $this->set('links', $links ?: null);
     }
 
-    public function callbacks(mixed ...$callbacks): static
+    public function callbacks(Callback ...$callbacks): static
     {
         return $this->set('callbacks', $callbacks ?: null);
     }

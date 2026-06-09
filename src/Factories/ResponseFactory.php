@@ -13,10 +13,7 @@ abstract class ResponseFactory
         ref as protected makeRef;
     }
 
-    /**
-     * @return ResponseBuilder|\OpenApi\Annotations\Response|array<string, mixed>
-     */
-    abstract public function build();
+    abstract public function build(): ResponseBuilder;
 
     public static function ref(?string $objectId = null): ResponseBuilder
     {

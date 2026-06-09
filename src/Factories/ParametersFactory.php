@@ -14,7 +14,7 @@ abstract class ParametersFactory
     }
 
     /**
-     * @return array<ParameterBuilder|\OpenApi\Annotations\Parameter|array<string, mixed>>
+     * @return array<int, ParameterBuilder>
      */
     abstract public function build(): array;
 

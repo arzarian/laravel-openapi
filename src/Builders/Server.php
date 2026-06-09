@@ -6,6 +6,11 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Server as SwaggerServer;
 
+/**
+ * @property-read ?string $url
+ * @property-read ?string $description
+ * @property-read list<ServerVariable> $variables
+ */
 class Server extends SpecificationBuilder
 {
     public function url(?string $url): static
@@ -18,7 +23,7 @@ class Server extends SpecificationBuilder
         return $this->set('description', $description);
     }
 
-    public function variables(mixed ...$variables): static
+    public function variables(ServerVariable ...$variables): static
     {
         return $this->set('variables', $variables ?: null);
     }

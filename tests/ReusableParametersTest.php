@@ -208,9 +208,9 @@ class ReusableParametersTest extends TestCase
         ], $spec['components']['parameters']['SlugParameter']);
     }
 
-    public function testArrayParameterObjectIdDoesNotBecomeReference(): void
+    public function testParameterObjectIdDoesNotBecomeReference(): void
     {
-        // Verifies array objectId does not masquerade as a ref target.
+        // Verifies parameter objectId does not masquerade as a ref target.
         $spec = $this->generateArray();
 
         self::assertSame([
@@ -220,8 +220,8 @@ class ReusableParametersTest extends TestCase
         ], $spec['paths']['/array-object-id-parameters']['get']['parameters']);
 
         self::assertSame([
-            'name' => 'array_object_id',
             'in' => 'query',
+            'name' => 'array_object_id',
             'description' => 'Array object id parameter',
             'schema' => [
                 'type' => 'string',

@@ -6,6 +6,10 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\ExternalDocumentation;
 
+/**
+ * @property-read ?string $description
+ * @property-read ?string $url
+ */
 class ExternalDocs extends SpecificationBuilder
 {
     public function description(?string $description): static

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DummyNamespace;
 
 use Vyuldashev\LaravelOpenApi\Builders\RequestBody;
@@ -7,7 +9,7 @@ use Vyuldashev\LaravelOpenApi\Factories\RequestBodyFactory;
 
 class DummyClass extends RequestBodyFactory
 {
-    public function build()
+    public function build(): RequestBody
     {
         return RequestBody::create('DummyRequestBody')
             ->description('Request body description');

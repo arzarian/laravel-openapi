@@ -6,6 +6,13 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Xml as SwaggerXml;
 
+/**
+ * @property-read ?string $name
+ * @property-read ?string $namespace
+ * @property-read ?string $prefix
+ * @property-read ?bool $attribute
+ * @property-read ?bool $wrapped
+ */
 class Xml extends SpecificationBuilder
 {
     public function name(?string $name): static

@@ -67,4 +67,38 @@ class GeneratorTest extends TestCase
             'deprecated' => true,
         ], $spec['components']['schemas']['RefSiblingWrapper']['properties']['refItem']);
     }
+
+    public function testReusableSchemaKeepsPropertyNamedTypeAsSchemaObject(): void
+    {
+        // Verifies schema property maps survive swagger-php annotation serialization.
+        config()->set('openapi.locations.schemas', [
+            __DIR__ . '/Fixtures/OpenApi/Schemas',
+        ]);
+
+        $spec = $this->generateArray();
+
+        self::assertSame([
+            'required' => [
+                'type',
+                'title',
+            ],
+            'properties' => [
+                'type' => [
+                    'description' => 'Тип',
+                    'type' => 'string',
+                    'enum' => [
+                        'type1',
+                        'type2',
+                        'type3',
+                    ],
+                ],
+                'title' => [
+                    'description' => 'Заголовок',
+                    'type' => 'string',
+                    'example' => 'Заголовок',
+                ],
+            ],
+            'type' => 'object',
+        ], $spec['components']['schemas']['NamedTypeProperty']);
+    }
 }

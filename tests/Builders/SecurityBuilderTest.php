@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Vyuldashev\LaravelOpenApi\Tests\Builders;
 
-use OpenApi\Annotations\SecurityScheme;
 use phpDocumentor\Reflection\DocBlock;
 use Vyuldashev\LaravelOpenApi\Attributes\Operation as AttributesOperation;
+use Vyuldashev\LaravelOpenApi\Builders\SecurityScheme;
 use Vyuldashev\LaravelOpenApi\Builders\Paths\Operation\SecurityBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Paths\OperationsBuilder;
 use Vyuldashev\LaravelOpenApi\Factories\SecuritySchemeFactory;
@@ -25,11 +25,11 @@ class SecurityBuilderTest extends TestCase
 
         self::assertSame([
             'securityScheme' => 'JWT',
-            'type' => 'http',
             'name' => 'TestScheme',
+            'type' => 'http',
             'in' => 'header',
-            'bearerFormat' => 'JWT',
             'scheme' => 'bearer',
+            'bearerFormat' => 'JWT',
         ], \json_decode($testJwtScheme->toJson(), true));
     }
 
@@ -94,13 +94,11 @@ class JwtSecurityScheme extends SecuritySchemeFactory
 {
     public function build(): SecurityScheme
     {
-        return new SecurityScheme([
-            'securityScheme' => 'JWT',
-            'name' => 'TestScheme',
-            'type' => 'http',
-            'in' => 'header',
-            'scheme' => 'bearer',
-            'bearerFormat' => 'JWT',
-        ]);
+        return SecurityScheme::create('JWT')
+            ->name('TestScheme')
+            ->type(SecurityScheme::TYPE_HTTP)
+            ->in(SecurityScheme::IN_HEADER)
+            ->scheme('bearer')
+            ->bearerFormat('JWT');
     }
 }

@@ -6,6 +6,20 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Header as SwaggerHeader;
 
+/**
+ * @property-read ?string $header
+ * @property-read ?string $description
+ * @property-read ?bool $required
+ * @property-read ?Schema $schema
+ * @property-read mixed $example
+ * @property-read list<Example> $examples
+ * @property-read list<MediaType> $content
+ * @property-read ?bool $deprecated
+ * @property-read ?bool $allowEmptyValue
+ * @property-read ?string $style
+ * @property-read ?bool $explode
+ * @property-read ?bool $allowReserved
+ */
 class Header extends SpecificationBuilder
 {
     public function description(?string $description): static
@@ -18,7 +32,7 @@ class Header extends SpecificationBuilder
         return $this->set('required', $required);
     }
 
-    public function schema(mixed $schema): static
+    public function schema(Schema $schema): static
     {
         return $this->set('schema', $schema);
     }
@@ -28,12 +42,12 @@ class Header extends SpecificationBuilder
         return $this->set('example', $example);
     }
 
-    public function examples(mixed ...$examples): static
+    public function examples(Example ...$examples): static
     {
         return $this->set('examples', $examples ?: null);
     }
 
-    public function content(mixed ...$content): static
+    public function content(MediaType ...$content): static
     {
         return $this->set('content', $content ?: null);
     }

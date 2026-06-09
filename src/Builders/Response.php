@@ -6,6 +6,14 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Response as SwaggerResponse;
 
+/**
+ * @property-read int|string|null $response
+ * @property-read ?int $statusCode
+ * @property-read ?string $description
+ * @property-read list<Header> $headers
+ * @property-read list<MediaType> $content
+ * @property-read list<Link> $links
+ */
 class Response extends SpecificationBuilder
 {
     protected const STATUSES = [
@@ -96,17 +104,17 @@ class Response extends SpecificationBuilder
         return $this->set('description', $description);
     }
 
-    public function headers(mixed ...$headers): static
+    public function headers(Header ...$headers): static
     {
         return $this->set('headers', $headers ?: null);
     }
 
-    public function content(mixed ...$content): static
+    public function content(MediaType ...$content): static
     {
         return $this->set('content', $content ?: null);
     }
 
-    public function links(mixed ...$links): static
+    public function links(Link ...$links): static
     {
         return $this->set('links', $links ?: null);
     }

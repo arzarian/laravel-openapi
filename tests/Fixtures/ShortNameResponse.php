@@ -9,7 +9,7 @@ use Vyuldashev\LaravelOpenApi\Factories\ResponseFactory;
 
 class ShortNameResponse extends ResponseFactory
 {
-    public function build()
+    public function build(): Response
     {
         return Response::ok('ShortName');
     }

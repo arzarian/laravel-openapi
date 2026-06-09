@@ -6,6 +6,14 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Encoding as SwaggerEncoding;
 
+/**
+ * @property-read ?string $property
+ * @property-read ?string $contentType
+ * @property-read list<Header> $headers
+ * @property-read ?string $style
+ * @property-read ?bool $explode
+ * @property-read ?bool $allowReserved
+ */
 class Encoding extends SpecificationBuilder
 {
     public function property(?string $property): static
@@ -18,7 +26,7 @@ class Encoding extends SpecificationBuilder
         return $this->set('contentType', $contentType);
     }
 
-    public function headers(mixed ...$headers): static
+    public function headers(Header ...$headers): static
     {
         return $this->set('headers', $headers ?: null);
     }

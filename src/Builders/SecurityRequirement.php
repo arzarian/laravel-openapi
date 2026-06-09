@@ -6,6 +6,10 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Attachable;
 
+/**
+ * @property-read ?string $securityScheme
+ * @property-read list<string> $scopes
+ */
 class SecurityRequirement extends SpecificationBuilder
 {
     public function securityScheme(?string $securityScheme): static

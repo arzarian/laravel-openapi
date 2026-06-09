@@ -13,10 +13,7 @@ abstract class SecuritySchemeFactory
         ref as protected makeRef;
     }
 
-    /**
-     * @return SecuritySchemeBuilder|\OpenApi\Annotations\SecurityScheme|array<string, mixed>
-     */
-    abstract public function build();
+    abstract public function build(): SecuritySchemeBuilder;
 
     public static function ref(?string $objectId = null): SecuritySchemeBuilder
     {

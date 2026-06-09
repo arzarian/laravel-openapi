@@ -15,7 +15,7 @@ class BoundSchema extends SchemaFactory implements Reusable
     ) {
     }
 
-    public function build()
+    public function build(): Schema
     {
         return Schema::string($this->schemaName);
     }

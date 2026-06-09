@@ -8,8 +8,5 @@ use Vyuldashev\LaravelOpenApi\Builders\Server as ServerBuilder;
 
 abstract class ServerFactory
 {
-    /**
-     * @return ServerBuilder|\OpenApi\Annotations\Server|array<string, mixed>
-     */
-    abstract public function build();
+    abstract public function build(): ServerBuilder;
 }

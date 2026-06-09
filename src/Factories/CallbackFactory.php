@@ -14,10 +14,7 @@ abstract class CallbackFactory
         ref as protected makeRef;
     }
 
-    /**
-     * @return CallbackBuilder|CallbackDefinition|array<string, mixed>
-     */
-    abstract public function build(): array|CallbackDefinition|CallbackBuilder;
+    abstract public function build(): CallbackDefinition|CallbackBuilder;
 
     /**
      * @param string|null $objectId

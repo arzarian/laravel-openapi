@@ -12,7 +12,7 @@ use Vyuldashev\LaravelOpenApi\Factories\ResponseFactory;
 
 class ErrorValidationResponse extends ResponseFactory implements Reusable
 {
-    public function build()
+    public function build(): Response
     {
         $response = Schema::object()->properties(
             Schema::string('message')->example('The given data was invalid.'),

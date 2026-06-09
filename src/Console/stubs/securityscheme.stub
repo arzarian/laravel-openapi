@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DummyNamespace;
 
 use Vyuldashev\LaravelOpenApi\Builders\SecurityScheme;
@@ -7,7 +9,7 @@ use Vyuldashev\LaravelOpenApi\Factories\SecuritySchemeFactory;
 
 class DummyClass extends SecuritySchemeFactory
 {
-    public function build()
+    public function build(): SecurityScheme
     {
         return SecurityScheme::create('DummySecurityScheme')
             ->type(SecurityScheme::TYPE_HTTP)
