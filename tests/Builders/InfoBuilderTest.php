@@ -4,23 +4,18 @@ declare(strict_types=1);
 
 namespace Vyuldashev\LaravelOpenApi\Tests\Builders;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Vyuldashev\LaravelOpenApi\Builders\InfoBuilder;
 use Vyuldashev\LaravelOpenApi\Tests\TestCase;
 
 class InfoBuilderTest extends TestCase
 {
-    /**
-     * @dataProvider providerBuildContact
-     *
-     * @param  array  $config
-     * @param  array  $expected
-     * @return void
-     */
+    #[DataProvider('providerBuildContact')]
     public function testBuildContact(array $config, array $expected): void
     {
         $SUT = new InfoBuilder();
         $info = $SUT->build($config);
-        $this->assertSameAssociativeArray($expected, $info->toArray());
+        $this->assertSameAssociativeArray($expected, json_decode($info->toJson(), true));
     }
 
     public static function providerBuildContact(): array

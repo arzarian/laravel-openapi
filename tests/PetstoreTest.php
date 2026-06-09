@@ -28,7 +28,7 @@ class PetstoreTest extends TestCase
 
     public function testGenerate(): void
     {
-        $spec = $this->generate()->toArray();
+        $spec = $this->generateArray();
 
         self::assertSame('http://petstore.swagger.io/v1', $spec['servers'][0]['url']);
 
@@ -45,8 +45,8 @@ class PetstoreTest extends TestCase
                     'description' => 'How many items to return at one time (max 100)',
                     'required' => false,
                     'schema' => [
-                        'format' => 'int32',
                         'type' => 'integer',
+                        'format' => 'int32',
                     ],
                 ],
             ],
@@ -62,15 +62,14 @@ class PetstoreTest extends TestCase
         self::assertArrayHasKey('Pet', $spec['components']['schemas']);
 
         self::assertSame([
-            'type' => 'object',
             'required' => [
                 'id',
                 'name',
             ],
             'properties' => [
                 'id' => [
-                    'format' => 'int64',
                     'type' => 'integer',
+                    'format' => 'int64',
                 ],
                 'name' => [
                     'type' => 'string',
@@ -79,6 +78,31 @@ class PetstoreTest extends TestCase
                     'type' => 'string',
                 ],
             ],
+            'type' => 'object',
         ], $spec['components']['schemas']['Pet']);
+    }
+
+    public function testGenerateOpenApi31Example(): void
+    {
+        config()->set('openapi.collections.default.openapi', '3.1.2');
+        config()->set('openapi.locations.schemas', [
+            __DIR__.'/../examples/petstore/OpenApi31/Schemas',
+        ]);
+
+        $spec = $this->generateArray();
+
+        self::assertSame('3.1.2', $spec['openapi']);
+        self::assertSame([
+            'properties' => [
+                'kind' => [
+                    'type' => 'string',
+                    'const' => 'pet',
+                ],
+                'nickname' => [
+                    'type' => ['string', 'null'],
+                ],
+            ],
+            'type' => 'object',
+        ], $spec['components']['schemas']['PetStatus']);
     }
 }

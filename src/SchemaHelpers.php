@@ -2,7 +2,7 @@
 
 namespace Vyuldashev\LaravelOpenApi;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
+use OpenApi\Annotations\Schema;
 use ReflectionType;
 
 class SchemaHelpers
@@ -11,11 +11,11 @@ class SchemaHelpers
     {
         switch ($reflectionType->getName()) {
             case 'int':
-                return Schema::integer();
+                return new Schema(['type' => 'integer']);
             case 'bool':
-                return Schema::boolean();
+                return new Schema(['type' => 'boolean']);
         }
 
-        return Schema::string();
+        return new Schema(['type' => 'string']);
     }
 }

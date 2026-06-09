@@ -11,6 +11,13 @@ class ResponseFactoryMakeCommand extends GeneratorCommand
     protected $description = 'Create a new Response factory class';
     protected $type = 'Response';
 
+    protected function buildClass($name)
+    {
+        $output = parent::buildClass($name);
+
+        return str_replace('DummyResponse', Str::replaceLast('Response', '', class_basename($name)), $output);
+    }
+
     protected function getStub(): string
     {
         return __DIR__.'/stubs/response.stub';

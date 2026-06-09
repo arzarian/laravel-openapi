@@ -2,7 +2,7 @@
 
 namespace Vyuldashev\LaravelOpenApi\Http;
 
-use GoldSpecDigital\ObjectOrientedOAS\OpenApi;
+use OpenApi\Annotations\OpenApi;
 use Vyuldashev\LaravelOpenApi\Generator;
 
 class OpenApiController

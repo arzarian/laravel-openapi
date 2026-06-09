@@ -2,7 +2,7 @@
 
 namespace Vyuldashev\LaravelOpenApi\Factories;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\SecurityScheme;
+use OpenApi\Annotations\SecurityScheme;
 
 abstract class SecuritySchemeFactory
 {

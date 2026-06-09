@@ -2,15 +2,21 @@
 
 namespace Vyuldashev\LaravelOpenApi\Builders\Paths\Operation;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\RequestBody;
+use OpenApi\Annotations\RequestBody;
 use Vyuldashev\LaravelOpenApi\Attributes\RequestBody as RequestBodyAttribute;
 use Vyuldashev\LaravelOpenApi\Contracts\Reusable;
 use Vyuldashev\LaravelOpenApi\Factories\RequestBodyFactory;
 use Vyuldashev\LaravelOpenApi\RouteInformation;
+use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecificationObjectSerializer;
 
 class RequestBodyBuilder
 {
-    public function build(RouteInformation $route): ?RequestBody
+    public function __construct(
+        protected SpecificationObjectSerializer $serializer
+    ) {
+    }
+
+    public function build(RouteInformation $route): mixed
     {
         /** @var RequestBodyAttribute|null $requestBody */
         $requestBody = $route->actionAttributes->first(static fn (object $attribute) => $attribute instanceof RequestBodyAttribute);
@@ -22,8 +28,14 @@ class RequestBodyBuilder
             $requestBody = $requestBodyFactory->build();
 
             if ($requestBodyFactory instanceof Reusable) {
-                return RequestBody::ref('#/components/requestBodies/'.$requestBody->objectId);
+                $name = $this->serializer->componentName($requestBody, 'request');
+
+                return new RequestBody([
+                    'ref' => '#/components/requestBodies/'.$name,
+                ]);
             }
+
+            return $this->serializer->toArray($requestBody);
         }
 
         return $requestBody;

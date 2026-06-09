@@ -2,37 +2,50 @@
 
 namespace DummyNamespace;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\MediaType;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Operation;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\PathItem;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\RequestBody;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Response;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
+use OpenApi\Annotations\MediaType;
+use OpenApi\Annotations\PathItem;
+use OpenApi\Annotations\Post;
+use OpenApi\Annotations\Property;
+use OpenApi\Annotations\RequestBody;
+use OpenApi\Annotations\Response;
+use OpenApi\Annotations\Schema;
 use Vyuldashev\LaravelOpenApi\Factories\CallbackFactory;
+use Vyuldashev\LaravelOpenApi\Support\OpenApi\CallbackDefinition;
 
 class DummyClass extends CallbackFactory
 {
-    public function build(): PathItem
+    public function build(): CallbackDefinition
     {
-        return PathItem::create('MyEvent')
-            ->route('{$request.body#/callbackUrl}')
-            ->operations(
-                Operation::post()
-                    ->requestBody(
-                        RequestBody::create()
-                            ->description('something happened')
-                            ->content(
-                                MediaType::json()->schema(
-                                    Schema::object()
-                                        ->properties(
-                                            Schema::string('foo')
-                                        )
-                                )
-                            )
-                    )
-                    ->responses(
-                        Response::ok()->description('Your server returns this code if it accepts the callback')
-                    )
-            );
+        return new CallbackDefinition(
+            'MyEvent',
+            '{$request.body#/callbackUrl}',
+            new PathItem([
+                'post' => new Post([
+                    'requestBody' => new RequestBody([
+                        'description' => 'something happened',
+                        'content' => [
+                            new MediaType([
+                                'mediaType' => 'application/json',
+                                'schema' => new Schema([
+                                    'type' => 'object',
+                                    'properties' => [
+                                        new Property([
+                                            'property' => 'foo',
+                                            'type' => 'string',
+                                        ]),
+                                    ],
+                                ]),
+                            ]),
+                        ],
+                    ]),
+                    'responses' => [
+                        new Response([
+                            'response' => 200,
+                            'description' => 'Your server returns this code if it accepts the callback',
+                        ]),
+                    ],
+                ]),
+            ])
+        );
     }
 }

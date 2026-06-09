@@ -11,6 +11,13 @@ class RequestBodyFactoryMakeCommand extends GeneratorCommand
     protected $description = 'Create a new RequestBody factory class';
     protected $type = 'RequestBody';
 
+    protected function buildClass($name)
+    {
+        $output = parent::buildClass($name);
+
+        return str_replace('DummyRequestBody', Str::replaceLast('RequestBody', '', class_basename($name)), $output);
+    }
+
     protected function getStub(): string
     {
         return __DIR__.'/stubs/requestbody.stub';

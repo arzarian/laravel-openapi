@@ -2,10 +2,17 @@
 
 namespace Vyuldashev\LaravelOpenApi\Builders\Paths;
 
-use GoldSpecDigital\ObjectOrientedOAS\Exceptions\InvalidArgumentException;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Operation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use OpenApi\Annotations\Delete;
+use OpenApi\Annotations\Get;
+use OpenApi\Annotations\Head;
+use OpenApi\Annotations\Operation;
+use OpenApi\Annotations\Options;
+use OpenApi\Annotations\Patch;
+use OpenApi\Annotations\Post;
+use OpenApi\Annotations\Put;
+use OpenApi\Annotations\Trace;
 use phpDocumentor\Reflection\DocBlock;
 use Vyuldashev\LaravelOpenApi\Attributes\Operation as OperationAttribute;
 use Vyuldashev\LaravelOpenApi\Builders\ExtensionsBuilder;
@@ -16,6 +23,8 @@ use Vyuldashev\LaravelOpenApi\Builders\Paths\Operation\ResponsesBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Paths\Operation\SecurityBuilder;
 use Vyuldashev\LaravelOpenApi\Factories\ServerFactory;
 use Vyuldashev\LaravelOpenApi\RouteInformation;
+use Vyuldashev\LaravelOpenApi\Support\OpenApi\CallbackDefinition;
+use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecificationObjectSerializer;
 
 class OperationsBuilder
 {
@@ -25,6 +34,7 @@ class OperationsBuilder
     protected ResponsesBuilder $responsesBuilder;
     protected ExtensionsBuilder $extensionsBuilder;
     protected SecurityBuilder $securityBuilder;
+    protected SpecificationObjectSerializer $serializer;
 
     public function __construct(
         CallbacksBuilder   $callbacksBuilder,
@@ -32,7 +42,8 @@ class OperationsBuilder
         RequestBodyBuilder $requestBodyBuilder,
         ResponsesBuilder   $responsesBuilder,
         ExtensionsBuilder  $extensionsBuilder,
-        SecurityBuilder    $securityBuilder
+        SecurityBuilder    $securityBuilder,
+        SpecificationObjectSerializer $serializer
     )
     {
         $this->callbacksBuilder = $callbacksBuilder;
@@ -41,13 +52,13 @@ class OperationsBuilder
         $this->responsesBuilder = $responsesBuilder;
         $this->extensionsBuilder = $extensionsBuilder;
         $this->securityBuilder = $securityBuilder;
+        $this->serializer = $serializer;
     }
 
     /**
      * @param RouteInformation[]|Collection $routes
      * @return array
      *
-     * @throws InvalidArgumentException
      */
     public function build(array|Collection $routes): array
     {
@@ -72,25 +83,30 @@ class OperationsBuilder
             $callbacks = $this->callbacksBuilder->build($route);
             $security = $this->securityBuilder->build($route);
 
-            $operation = Operation::create()
-                ->action(Str::lower($operationAttribute->method) ?: $route->method)
-                ->tags(...$tags)
-                ->deprecated($this->isDeprecated($route->actionDocBlock))
-                ->description($route->actionDocBlock->getDescription()->render() !== '' ? $route->actionDocBlock->getDescription()->render() : null)
-                ->summary($route->actionDocBlock->getSummary() !== '' ? $route->actionDocBlock->getSummary() : null)
-                ->operationId($operationId)
-                ->parameters(...$parameters)
-                ->requestBody($requestBody)
-                ->responses(...$responses)
-                ->callbacks(...$callbacks)
-                ->servers(...$servers);
+            $properties = [
+                'tags' => $tags,
+                'deprecated' => $this->isDeprecated($route->actionDocBlock),
+                'description' => $route->actionDocBlock->getDescription()->render() !== '' ? $route->actionDocBlock->getDescription()->render() : null,
+                'summary' => $route->actionDocBlock->getSummary() !== '' ? $route->actionDocBlock->getSummary() : null,
+                'operationId' => $operationId,
+                'parameters' => $parameters,
+                'requestBody' => $requestBody,
+                'responses' => $responses,
+                'callbacks' => $this->callbacksToArray($callbacks),
+                'servers' => $servers,
+            ];
 
-            /** Not the cleanest code, we need to call notSecurity instead of security when our security has been turned off */
-            if (count($security) === 1 && $security[0]->securityScheme === null) {
-                $operation = $operation->noSecurity();
-            } else {
-                $operation = $operation->security(...$security);
+            $properties = $this->serializer->properties($properties);
+            if ($security === [[]]) {
+                $properties['security'] = [];
+            } elseif ($security !== []) {
+                $properties['security'] = $security;
             }
+
+            $operation = $this->makeOperation(
+                Str::lower($operationAttribute->method) ?: $route->method,
+                $properties
+            );
 
             $this->extensionsBuilder->build($operation, $route->actionAttributes);
 
@@ -98,6 +114,49 @@ class OperationsBuilder
         }
 
         return $operations;
+    }
+
+    protected function makeOperation(string $method, array $properties): Operation
+    {
+        return match ($method) {
+            'get' => new Get($properties),
+            'post' => new Post($properties),
+            'put' => new Put($properties),
+            'delete' => new Delete($properties),
+            'options' => new Options($properties),
+            'head' => new Head($properties),
+            'patch' => new Patch($properties),
+            'trace' => new Trace($properties),
+            default => new Get($properties),
+        };
+    }
+
+    protected function callbacksToArray(array $callbacks): array
+    {
+        $serialized = [];
+
+        foreach ($callbacks as $callback) {
+            if ($callback instanceof CallbackDefinition) {
+                $serialized[$callback->name] = $this->serializer->toArray($callback);
+                continue;
+            }
+
+            $callback = $this->serializer->toArray($callback);
+
+            if (array_key_exists('$ref', $callback)) {
+                $serialized[] = $callback;
+                continue;
+            }
+
+            $name = $callback['path'] ?? $callback['route'] ?? null;
+            unset($callback['path'], $callback['route']);
+
+            if ($name !== null) {
+                $serialized[$name] = $callback;
+            }
+        }
+
+        return $serialized;
     }
 
     protected function isDeprecated(?DocBlock $actionDocBlock): ?bool

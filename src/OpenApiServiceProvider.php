@@ -17,6 +17,7 @@ use Vyuldashev\LaravelOpenApi\Builders\InfoBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\PathsBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\ServersBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\TagsBuilder;
+use Vyuldashev\LaravelOpenApi\Support\OpenApi\OpenApiFactory;
 
 class OpenApiServiceProvider extends ServiceProvider
 {
@@ -56,7 +57,8 @@ class OpenApiServiceProvider extends ServiceProvider
                 $app->make(ServersBuilder::class),
                 $app->make(TagsBuilder::class),
                 $app->make(PathsBuilder::class),
-                $app->make(ComponentsBuilder::class)
+                $app->make(ComponentsBuilder::class),
+                $app->make(OpenApiFactory::class)
             );
         });
 

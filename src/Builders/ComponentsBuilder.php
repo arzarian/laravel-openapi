@@ -2,13 +2,14 @@
 
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Components;
+use OpenApi\Annotations\Components;
 use Vyuldashev\LaravelOpenApi\Builders\Components\CallbacksBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\RequestBodiesBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\ResponsesBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\SchemasBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\SecuritySchemesBuilder;
 use Vyuldashev\LaravelOpenApi\Generator;
+use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecificationObjectSerializer;
 
 class ComponentsBuilder
 {
@@ -17,19 +18,22 @@ class ComponentsBuilder
     protected ResponsesBuilder $responsesBuilder;
     protected SchemasBuilder $schemasBuilder;
     protected SecuritySchemesBuilder $securitySchemesBuilder;
+    protected SpecificationObjectSerializer $serializer;
 
     public function __construct(
         CallbacksBuilder $callbacksBuilder,
         RequestBodiesBuilder $requestBodiesBuilder,
         ResponsesBuilder $responsesBuilder,
         SchemasBuilder $schemasBuilder,
-        SecuritySchemesBuilder $securitySchemesBuilder
+        SecuritySchemesBuilder $securitySchemesBuilder,
+        SpecificationObjectSerializer $serializer
     ) {
         $this->callbacksBuilder = $callbacksBuilder;
         $this->requestBodiesBuilder = $requestBodiesBuilder;
         $this->responsesBuilder = $responsesBuilder;
         $this->schemasBuilder = $schemasBuilder;
         $this->securitySchemesBuilder = $securitySchemesBuilder;
+        $this->serializer = $serializer;
     }
 
     public function build(
@@ -42,45 +46,63 @@ class ComponentsBuilder
         $schemas = $this->schemasBuilder->build($collection);
         $securitySchemes = $this->securitySchemesBuilder->build($collection);
 
-        $components = Components::create();
+        $properties = [];
 
         $hasAnyObjects = false;
 
         if (count($callbacks) > 0) {
             $hasAnyObjects = true;
 
-            $components = $components->callbacks(...$callbacks);
+            $properties['callbacks'] = $this->callbacksToArray($callbacks);
         }
 
         if (count($requestBodies) > 0) {
             $hasAnyObjects = true;
 
-            $components = $components->requestBodies(...$requestBodies);
+            $properties['requestBodies'] = $requestBodies;
         }
 
         if (count($responses) > 0) {
             $hasAnyObjects = true;
-            $components = $components->responses(...$responses);
+            $properties['responses'] = $responses;
         }
 
         if (count($schemas) > 0) {
             $hasAnyObjects = true;
-            $components = $components->schemas(...$schemas);
+            $properties['schemas'] = $schemas;
         }
 
         if (count($securitySchemes) > 0) {
             $hasAnyObjects = true;
-            $components = $components->securitySchemes(...$securitySchemes);
+            $properties['securitySchemes'] = $securitySchemes;
         }
 
         if (! $hasAnyObjects) {
             return null;
         }
 
+        $components = new Components($properties);
+
         foreach ($middlewares as $middleware) {
             app($middleware)->after($components);
         }
 
         return $components;
+    }
+
+    protected function callbacksToArray(array $callbacks): array
+    {
+        $mapped = [];
+
+        foreach ($callbacks as $callback) {
+            $key = $callback->name;
+            $value = $this->serializer->toArray($callback);
+
+            if ($key !== null) {
+                $mapped[$key] = $value;
+            }
+        }
+
+        return $mapped;
     }
 }

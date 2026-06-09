@@ -2,14 +2,15 @@
 
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\BaseObject;
 use Illuminate\Support\Collection;
+use OpenApi\Annotations\AbstractAnnotation;
+use OpenApi\Generator;
 use Vyuldashev\LaravelOpenApi\Attributes\Extension as ExtensionAttribute;
 use Vyuldashev\LaravelOpenApi\Factories\ExtensionFactory;
 
 class ExtensionsBuilder
 {
-    public function build(BaseObject $object, Collection $attributes): void
+    public function build(AbstractAnnotation $object, Collection $attributes): void
     {
         $attributes
             ->filter(static fn (object $attribute) => $attribute instanceof ExtensionAttribute)
@@ -24,10 +25,11 @@ class ExtensionsBuilder
                     $value = $attribute->value;
                 }
 
-                $object->x(
-                    $key,
-                    $value
-                );
+                if (Generator::isDefault($object->x)) {
+                    $object->x = [];
+                }
+
+                $object->x[preg_replace('/^x-/', '', $key)] = $value;
             });
     }
 }

@@ -6,6 +6,8 @@ return [
 
         'default' => [
 
+            'openapi' => env('OPENAPI_SPEC_VERSION', '3.0.0'),
+
             'info' => [
                 'title' => config('app.name'),
                 'description' => null,
@@ -31,7 +33,7 @@ return [
             ],
 
             'security' => [
-                // GoldSpecDigital\ObjectOrientedOAS\Objects\SecurityRequirement::create()->securityScheme('JWT'),
+                // ['JWT' => []],
             ],
 
             // Non standard attributes used by code/doc generation tools can be added here

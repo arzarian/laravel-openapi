@@ -4,23 +4,18 @@ declare(strict_types=1);
 
 namespace Vyuldashev\LaravelOpenApi\Tests\Builders;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Vyuldashev\LaravelOpenApi\Builders\TagsBuilder;
 use Vyuldashev\LaravelOpenApi\Tests\TestCase;
 
 class TagsBuilderTest extends TestCase
 {
-    /**
-     * @dataProvider providerBuild
-     *
-     * @param  array  $config
-     * @param  array  $expected
-     * @return void
-     */
+    #[DataProvider('providerBuild')]
     public function testBuild(array $config, array $expected): void
     {
         $builder = new TagsBuilder();
         $tags = $builder->build($config);
-        $this->assertSameAssociativeArray($expected[0], $tags[0]->toArray());
+        $this->assertSameAssociativeArray($expected[0], json_decode($tags[0]->toJson(), true));
     }
 
     public static function providerBuild(): array

@@ -2,10 +2,8 @@
 
 namespace Vyuldashev\LaravelOpenApi\Tests\Builders;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Operation;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\PathItem;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
-use GoldSpecDigital\ObjectOrientedOAS\OpenApi;
+use OpenApi\Annotations\Get;
+use OpenApi\Annotations\Schema;
 use Vyuldashev\LaravelOpenApi\Attributes\Extension;
 use Vyuldashev\LaravelOpenApi\Builders\ExtensionsBuilder;
 use Vyuldashev\LaravelOpenApi\Factories\ExtensionFactory;
@@ -15,14 +13,7 @@ class ExtensionsBuilderTest extends TestCase
 {
     public function testBuildUsingFactory(): void
     {
-        $operation = Operation::create()->action('get');
-
-        $openApi = OpenApi::create()
-            ->paths(
-                PathItem::create()
-                    ->route('/foo')
-                    ->operations($operation)
-            );
+        $operation = new Get([]);
 
         /** @var ExtensionsBuilder $builder */
         $builder = resolve(ExtensionsBuilder::class);
@@ -31,26 +22,13 @@ class ExtensionsBuilderTest extends TestCase
         ]));
 
         self::assertSame([
-            'paths' => [
-                '/foo' => [
-                    'get' => [
-                        'x-uuid' => ['format' => 'uuid', 'type' => 'string'],
-                    ],
-                ],
-            ],
-        ], $openApi->toArray());
+            'x-uuid' => ['type' => 'string', 'format' => 'uuid'],
+        ], json_decode($operation->toJson(), true));
     }
 
     public function testBuildUsingKeyValue(): void
     {
-        $operation = Operation::create()->action('get');
-
-        $openApi = OpenApi::create()
-            ->paths(
-                PathItem::create()
-                    ->route('/foo')
-                    ->operations($operation)
-            );
+        $operation = new Get([]);
 
         /** @var ExtensionsBuilder $builder */
         $builder = resolve(ExtensionsBuilder::class);
@@ -60,15 +38,9 @@ class ExtensionsBuilderTest extends TestCase
         ]));
 
         self::assertSame([
-            'paths' => [
-                '/foo' => [
-                    'get' => [
-                        'x-foo' => 'bar',
-                        'x-key' => '1',
-                    ],
-                ],
-            ],
-        ], $openApi->toArray());
+            'x-foo' => 'bar',
+            'x-key' => '1',
+        ], json_decode($operation->toJson(), true));
     }
 }
 
@@ -84,6 +56,9 @@ class FakeExtension extends ExtensionFactory
      */
     public function value()
     {
-        return Schema::string()->format(Schema::FORMAT_UUID);
+        return new Schema([
+            'format' => 'uuid',
+            'type' => 'string',
+        ]);
     }
 }

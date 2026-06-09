@@ -2,12 +2,7 @@
 
 namespace Vyuldashev\LaravelOpenApi\Tests\Builders;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Components;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Operation;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\PathItem;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\SecurityRequirement;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\SecurityScheme;
-use GoldSpecDigital\ObjectOrientedOAS\OpenApi;
+use OpenApi\Annotations\SecurityScheme;
 use phpDocumentor\Reflection\DocBlock;
 use Vyuldashev\LaravelOpenApi\Attributes\Operation as AttributesOperation;
 use Vyuldashev\LaravelOpenApi\Builders\Paths\Operation\SecurityBuilder;
@@ -26,47 +21,14 @@ class SecurityBuilderTest extends TestCase
         $securityFactory = resolve(JwtSecurityScheme::class);
         $testJwtScheme = $securityFactory->build();
 
-        $globalRequirement = SecurityRequirement::create('JWT')
-            ->securityScheme($testJwtScheme);
-
-        $components = Components::create()
-            ->securitySchemes($testJwtScheme);
-
-        $operation = Operation::create()
-            ->action('get');
-
-        $openApi = OpenApi::create()
-            ->security($globalRequirement)
-            ->components($components)
-            ->paths(
-                PathItem::create()
-                    ->route('/foo')
-                    ->operations($operation)
-            );
-
         self::assertSame([
-            'paths' => [
-                '/foo' => [
-                    'get' => [],
-                ],
-            ],
-            'components' => [
-                'securitySchemes' => [
-                    'JWT' => [
-                        'type' => 'http',
-                        'name' => 'TestScheme',
-                        'in' => 'header',
-                        'scheme' => 'bearer',
-                        'bearerFormat' => 'JWT',
-                    ],
-                ],
-            ],
-            'security' => [
-                [
-                    'JWT' => [],
-                ],
-            ],
-        ], $openApi->toArray());
+            'securityScheme' => 'JWT',
+            'type' => 'http',
+            'name' => 'TestScheme',
+            'in' => 'header',
+            'bearerFormat' => 'JWT',
+            'scheme' => 'bearer',
+        ], json_decode($testJwtScheme->toJson(), true));
     }
 
     /**
@@ -75,15 +37,6 @@ class SecurityBuilderTest extends TestCase
      */
     public function testWeCanAddOperationSecurityUsingBuilder()
     {
-        $securityFactory = resolve(JwtSecurityScheme::class);
-        $testJwtScheme = $securityFactory->build();
-
-        $globalRequirement = SecurityRequirement::create('JWT')
-            ->securityScheme($testJwtScheme);
-
-        $components = Components::create()
-            ->securitySchemes($testJwtScheme);
-
         $routeInfo = new RouteInformation;
         $routeInfo->action = 'get';
         $routeInfo->name = 'test route';
@@ -95,48 +48,11 @@ class SecurityBuilderTest extends TestCase
         /** @var SecurityBuilder */
         $builder = resolve(SecurityBuilder::class);
 
-        $operation = Operation::create()
-            ->security(...$builder->build($routeInfo))
-            ->action('get');
-
-        $openApi = OpenApi::create()
-        ->security($globalRequirement)
-        ->components($components)
-        ->paths(
-            PathItem::create()
-                ->route('/foo')
-                ->operations($operation)
-        );
-
         self::assertSame([
-            'paths' => [
-                '/foo' => [
-                    'get' => [
-                        'security' => [
-                            [
-                                'JWT' => [],
-                            ],
-                        ],
-                    ],
-                ],
+            [
+                'JWT' => [],
             ],
-            'components' => [
-                'securitySchemes' => [
-                    'JWT' => [
-                        'type' => 'http',
-                        'name' => 'TestScheme',
-                        'in' => 'header',
-                        'scheme' => 'bearer',
-                        'bearerFormat' => 'JWT',
-                    ],
-                ],
-            ],
-            'security' => [
-                [
-                    'JWT' => [],
-                ],
-            ],
-        ], $openApi->toArray());
+        ], $builder->build($routeInfo));
     }
 
     /**
@@ -145,15 +61,6 @@ class SecurityBuilderTest extends TestCase
      */
     public function testWeCanAddTurnOffOperationSecurityUsingBuilder()
     {
-        $securityFactory = resolve(JwtSecurityScheme::class);
-        $testJwtScheme = $securityFactory->build();
-
-        $globalRequirement = SecurityRequirement::create('JWT')
-            ->securityScheme($testJwtScheme);
-
-        $components = Components::create()
-            ->securitySchemes($testJwtScheme);
-
         $routeInfo = new RouteInformation;
         $routeInfo->parameters = collect();
         $routeInfo->action = 'foo';
@@ -174,41 +81,10 @@ class SecurityBuilderTest extends TestCase
 
         $operations = $operationsBuilder->build([$routeInfo]);
 
-        $openApi = OpenApi::create()
-        ->security($globalRequirement)
-        ->components($components)
-        ->paths(
-            PathItem::create()
-                ->route('/foo')
-                ->operations(...$operations)
-        );
-
         self::assertSame([
-            'paths' => [
-                '/foo' => [
-                    'get' => [
-                        'summary' => 'Test',
-                        'security' => [],
-                    ],
-                ],
-            ],
-            'components' => [
-                'securitySchemes' => [
-                    'JWT' => [
-                        'type' => 'http',
-                        'name' => 'TestScheme',
-                        'in' => 'header',
-                        'scheme' => 'bearer',
-                        'bearerFormat' => 'JWT',
-                    ],
-                ],
-            ],
-            'security' => [
-                [
-                    'JWT' => [],
-                ],
-            ],
-        ], $openApi->toArray());
+            'summary' => 'Test',
+            'security' => [],
+        ], json_decode($operations[0]->toJson(), true));
     }
 }
 
@@ -216,11 +92,13 @@ class JwtSecurityScheme extends SecuritySchemeFactory
 {
     public function build(): SecurityScheme
     {
-        return SecurityScheme::create('JWT')
-            ->name('TestScheme')
-            ->type(SecurityScheme::TYPE_HTTP)
-            ->in(SecurityScheme::IN_HEADER)
-            ->scheme('bearer')
-            ->bearerFormat('JWT');
+        return new SecurityScheme([
+            'securityScheme' => 'JWT',
+            'name' => 'TestScheme',
+            'type' => 'http',
+            'in' => 'header',
+            'scheme' => 'bearer',
+            'bearerFormat' => 'JWT',
+        ]);
     }
 }

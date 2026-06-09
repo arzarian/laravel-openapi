@@ -4,23 +4,18 @@ declare(strict_types=1);
 
 namespace Vyuldashev\LaravelOpenApi\Tests\Builders;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Vyuldashev\LaravelOpenApi\Builders\ServersBuilder;
 use Vyuldashev\LaravelOpenApi\Tests\TestCase;
 
 class ServersBuilderTest extends TestCase
 {
-    /**
-     * @dataProvider providerBuild
-     *
-     * @param  array  $config
-     * @param  array  $expected
-     * @return void
-     */
+    #[DataProvider('providerBuild')]
     public function testBuild(array $config, array $expected): void
     {
         $SUT = new ServersBuilder();
         $servers = $SUT->build($config);
-        $this->assertSameAssociativeArray($expected[0], $servers[0]->toArray());
+        $this->assertSameAssociativeArray($expected[0], json_decode($servers[0]->toJson(), true));
     }
 
     public static function providerBuild(): array

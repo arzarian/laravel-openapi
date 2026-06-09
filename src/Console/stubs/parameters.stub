@@ -2,8 +2,8 @@
 
 namespace DummyNamespace;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Parameter;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Schema;
+use OpenApi\Annotations\Parameter;
+use OpenApi\Annotations\Schema;
 use Vyuldashev\LaravelOpenApi\Factories\ParametersFactory;
 
 class DummyClass extends ParametersFactory
@@ -15,11 +15,15 @@ class DummyClass extends ParametersFactory
     {
         return [
 
-            Parameter::query()
-                ->name('parameter-name')
-                ->description('Parameter description')
-                ->required(false)
-                ->schema(Schema::string()),
+            new Parameter([
+                'name' => 'parameter-name',
+                'in' => 'query',
+                'description' => 'Parameter description',
+                'required' => false,
+                'schema' => new Schema([
+                    'type' => 'string',
+                ]),
+            ]),
 
         ];
     }

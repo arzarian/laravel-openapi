@@ -2,17 +2,19 @@
 
 namespace Vyuldashev\LaravelOpenApi;
 
-use GoldSpecDigital\ObjectOrientedOAS\OpenApi;
 use Illuminate\Support\Arr;
+use OpenApi\Annotations\OpenApi;
 use Vyuldashev\LaravelOpenApi\Builders\ComponentsBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\InfoBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\PathsBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\ServersBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\TagsBuilder;
+use Vyuldashev\LaravelOpenApi\Support\OpenApi\OpenApiFactory;
+use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecVersion;
 
 class Generator
 {
-    public string $version = OpenApi::OPENAPI_3_0_2;
+    public string $version = SpecVersion::DEFAULT;
 
     public const COLLECTION_DEFAULT = 'default';
 
@@ -22,6 +24,7 @@ class Generator
     protected TagsBuilder $tagsBuilder;
     protected PathsBuilder $pathsBuilder;
     protected ComponentsBuilder $componentsBuilder;
+    protected OpenApiFactory $openApiFactory;
 
     public function __construct(
         array $config,
@@ -29,7 +32,8 @@ class Generator
         ServersBuilder $serversBuilder,
         TagsBuilder $tagsBuilder,
         PathsBuilder $pathsBuilder,
-        ComponentsBuilder $componentsBuilder
+        ComponentsBuilder $componentsBuilder,
+        OpenApiFactory $openApiFactory
     ) {
         $this->config = $config;
         $this->infoBuilder = $infoBuilder;
@@ -37,11 +41,19 @@ class Generator
         $this->tagsBuilder = $tagsBuilder;
         $this->pathsBuilder = $pathsBuilder;
         $this->componentsBuilder = $componentsBuilder;
+        $this->openApiFactory = $openApiFactory;
     }
 
     public function generate(string $collection = self::COLLECTION_DEFAULT): OpenApi
     {
         $middlewares = Arr::get($this->config, 'collections.'.$collection.'.middlewares');
+        $specVersion = SpecVersion::fromConfig(
+            Arr::get(
+                $this->config,
+                'collections.'.$collection.'.openapi',
+                Arr::get($this->config, 'collections.'.$collection.'.version')
+            )
+        );
 
         $info = $this->infoBuilder->build(Arr::get($this->config, 'collections.'.$collection.'.info', []));
         $servers = $this->serversBuilder->build(Arr::get($this->config, 'collections.'.$collection.'.servers', []));
@@ -50,19 +62,15 @@ class Generator
         $components = $this->componentsBuilder->build($collection, Arr::get($middlewares, 'components', []));
         $extensions = Arr::get($this->config, 'collections.'.$collection.'.extensions', []);
 
-        $openApi = OpenApi::create()
-            ->openapi(OpenApi::OPENAPI_3_0_2)
-            ->info($info)
-            ->servers(...$servers)
-            ->paths(...$paths)
-            ->components($components)
-            ->security(...Arr::get($this->config, 'collections.'.$collection.'.security', []))
-            ->tags(...$tags);
-
-        foreach ($extensions as $key => $value) {
-            $openApi = $openApi->x($key, $value);
-        }
-
-        return $openApi;
+        return $this->openApiFactory->create(
+            $specVersion,
+            $info,
+            $servers,
+            $tags,
+            $paths,
+            $components,
+            Arr::get($this->config, 'collections.'.$collection.'.security', []),
+            $extensions
+        );
     }
 }

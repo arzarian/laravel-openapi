@@ -2,10 +2,10 @@
 
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\PathItem;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Collection;
+use OpenApi\Annotations\PathItem;
 use Vyuldashev\LaravelOpenApi\Attributes;
 use Vyuldashev\LaravelOpenApi\Attributes\Collection as CollectionAttribute;
 use Vyuldashev\LaravelOpenApi\Builders\Paths\OperationsBuilder;
@@ -53,11 +53,14 @@ class PathsBuilder
             })
             ->groupBy(static fn (RouteInformation $routeInformation) => $routeInformation->uri)
             ->map(function (Collection $routes, $uri) {
-                $pathItem = PathItem::create()->route($uri);
-
                 $operations = $this->operationsBuilder->build($routes);
+                $properties = ['path' => $uri];
 
-                return $pathItem->operations(...$operations);
+                foreach ($operations as $operation) {
+                    $properties[$operation->method] = $operation;
+                }
+
+                return new PathItem($properties);
             })
             ->map(static function (PathItem $item) use ($middlewares) {
                 foreach ($middlewares as $middleware) {

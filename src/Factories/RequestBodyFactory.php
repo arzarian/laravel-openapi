@@ -2,7 +2,7 @@
 
 namespace Vyuldashev\LaravelOpenApi\Factories;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\RequestBody;
+use OpenApi\Annotations\RequestBody;
 use Vyuldashev\LaravelOpenApi\Concerns\Referencable;
 
 abstract class RequestBodyFactory

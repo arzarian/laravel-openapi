@@ -2,13 +2,18 @@
 
 namespace Vyuldashev\LaravelOpenApi\Builders\Paths\Operation;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\PathItem;
 use Vyuldashev\LaravelOpenApi\Attributes\Callback as CallbackAttribute;
 use Vyuldashev\LaravelOpenApi\Contracts\Reusable;
 use Vyuldashev\LaravelOpenApi\RouteInformation;
+use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecificationObjectSerializer;
 
 class CallbacksBuilder
 {
+    public function __construct(
+        protected SpecificationObjectSerializer $serializer
+    ) {
+    }
+
     public function build(RouteInformation $route): array
     {
         return $route->actionAttributes
@@ -18,10 +23,10 @@ class CallbacksBuilder
                 $pathItem = $factory->build();
 
                 if ($factory instanceof Reusable) {
-                    return PathItem::ref('#/components/callbacks/'.$pathItem->objectId);
+                    return ['$ref' => '#/components/callbacks/'.$pathItem->name];
                 }
 
-                return $pathItem;
+                return $this->serializer->toArray($pathItem);
             })
             ->values()
             ->toArray();

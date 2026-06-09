@@ -2,7 +2,7 @@
 
 namespace Vyuldashev\LaravelOpenApi\Factories;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Response;
+use OpenApi\Annotations\Response;
 use Vyuldashev\LaravelOpenApi\Concerns\Referencable;
 
 abstract class ResponseFactory

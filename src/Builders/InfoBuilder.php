@@ -2,19 +2,29 @@
 
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Contact;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Info;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\License;
 use Illuminate\Support\Arr;
+use OpenApi\Annotations\Contact;
+use OpenApi\Annotations\Info;
+use OpenApi\Annotations\License;
+use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecificationObjectSerializer;
 
 class InfoBuilder
 {
+    public function __construct(
+        ?SpecificationObjectSerializer $serializer = null
+    ) {
+        $this->serializer = $serializer ?? new SpecificationObjectSerializer();
+    }
+
+    protected SpecificationObjectSerializer $serializer;
+
     public function build(array $config): Info
     {
-        $info = Info::create()
-            ->title(Arr::get($config, 'title'))
-            ->description(Arr::get($config, 'description'))
-            ->version(Arr::get($config, 'version'));
+        $properties = [
+            'title' => Arr::get($config, 'title'),
+            'description' => Arr::get($config, 'description'),
+            'version' => Arr::get($config, 'version'),
+        ];
 
         if (Arr::has($config, 'contact') &&
             (
@@ -23,34 +33,32 @@ class InfoBuilder
                 array_key_exists('url', $config['contact'])
             )
         ) {
-            $info = $info->contact($this->buildContact($config['contact']));
+            $properties['contact'] = $this->buildContact($config['contact']);
         }
 
         if (Arr::has($config, 'license') && array_key_exists('name', $config['license'])) {
-            $info = $info->license($this->buildLicense($config['license']));
+            $properties['license'] = $this->buildLicense($config['license']);
         }
 
-        $extensions = $config['extensions'] ?? [];
+        $properties['x'] = $this->serializer->toArray($config['extensions'] ?? []);
 
-        foreach ($extensions as $key => $value) {
-            $info->x($key, $value);
-        }
-
-        return $info;
+        return new Info($this->serializer->properties($properties));
     }
 
     protected function buildContact(array $config): Contact
     {
-        return Contact::create()
-            ->name(Arr::get($config, 'name'))
-            ->email(Arr::get($config, 'email'))
-            ->url(Arr::get($config, 'url'));
+        return new Contact($this->serializer->properties([
+            'name' => Arr::get($config, 'name'),
+            'email' => Arr::get($config, 'email'),
+            'url' => Arr::get($config, 'url'),
+        ]));
     }
 
     protected function buildLicense(array $config): License
     {
-        return License::create()
-            ->name(Arr::get($config, 'name'))
-            ->url(Arr::get($config, 'url'));
+        return new License($this->serializer->properties([
+            'name' => Arr::get($config, 'name'),
+            'url' => Arr::get($config, 'url'),
+        ]));
     }
 }

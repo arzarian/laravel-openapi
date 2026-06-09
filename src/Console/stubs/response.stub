@@ -2,13 +2,16 @@
 
 namespace DummyNamespace;
 
-use GoldSpecDigital\ObjectOrientedOAS\Objects\Response;
+use OpenApi\Annotations\Response;
 use Vyuldashev\LaravelOpenApi\Factories\ResponseFactory;
 
 class DummyClass extends ResponseFactory
 {
     public function build(): Response
     {
-        return Response::ok()->description('Successful response');
+        return new Response([
+            'response' => 'DummyResponse',
+            'description' => 'Successful response',
+        ]);
     }
 }
