@@ -2,30 +2,27 @@ name: Tests
 
 on:
   push:
+    branches:
+      - master
   pull_request:
-  schedule:
-    - cron: '0 0 * * *'
+    branches:
+      - master
 
 jobs:
   tests:
     runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        include:
-          - php: '8.4'
-            laravel: '^12.0'
-            testbench: '^10.0'
-          - php: '8.4'
-            laravel: '^13.0'
-            testbench: '^11.0'
+        php: ["8.4", "8.5"]
+        laravel: ["^12.0", "^13.0"]
 
-    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
+    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -34,10 +31,48 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip
           coverage: none
 
+      - name: Set laravel version
+        run: composer require "laravel/framework=${{ matrix.laravel }}" --no-update --no-interaction --no-progress
+
       - name: Install dependencies
-        run: |
-          composer require laravel/framework:${{ matrix.laravel }} orchestra/testbench:${{ matrix.testbench }} --no-update --no-interaction
-          composer update --prefer-dist --no-interaction --no-progress
+        run: composer update --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit
+
+      - name: Execute pint
+        run: vendor/bin/pint --test
+
+      - name: Execute phpstan
+        run: vendor/bin/phpstan
+
+      - name: Execute rector
+        run: vendor/bin/rector --dry-run
+
+  lints:
+    runs-on: ubuntu-latest
+
+    name: Lints
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: dom, curl, libxml, mbstring, zip
+          coverage: none
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Execute pint
+        run: vendor/bin/pint --test
+
+      - name: Execute phpstan
+        run: vendor/bin/phpstan
+
+      - name: Execute rector
+        run: vendor/bin/rector --dry-run
