@@ -18,6 +18,11 @@ abstract class ParametersFactory
      */
     abstract public function build(): array;
 
+    /**
+     * Reference the first parameter built by this factory for backward compatibility.
+     * @param ?string $objectId
+     * @return ParameterBuilder
+     */
     public static function ref(?string $objectId = null): ParameterBuilder
     {
         $ref = static::makeRef($objectId);

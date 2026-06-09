@@ -10,6 +10,7 @@ use Vyuldashev\LaravelOpenApi\Builders\Response;
 use Vyuldashev\LaravelOpenApi\Builders\Schema;
 use Vyuldashev\LaravelOpenApi\Builders\SecurityScheme;
 use Vyuldashev\LaravelOpenApi\Factories\CallbackFactory;
+use Vyuldashev\LaravelOpenApi\Factories\ParameterFactory;
 use Vyuldashev\LaravelOpenApi\Factories\ParametersFactory;
 use Vyuldashev\LaravelOpenApi\Factories\RequestBodyFactory;
 use Vyuldashev\LaravelOpenApi\Factories\ResponseFactory;
@@ -22,6 +23,7 @@ class FactoryContractsTest extends TestCase
     public function testReferencableFactoriesExposeConcreteRefReturnTypes(): void
     {
         self::assertSame('array', $this->returnType(CallbackFactory::class, 'ref'));
+        self::assertSame(Parameter::class, $this->returnType(ParameterFactory::class, 'ref'));
         self::assertSame(Parameter::class, $this->returnType(ParametersFactory::class, 'ref'));
         self::assertSame(RequestBody::class, $this->returnType(RequestBodyFactory::class, 'ref'));
         self::assertSame(Response::class, $this->returnType(ResponseFactory::class, 'ref'));
@@ -31,6 +33,7 @@ class FactoryContractsTest extends TestCase
 
     public function testFactoryBuildMethodsKeepCompatibleReturnSurface(): void
     {
+        self::assertNull(new \ReflectionMethod(ParameterFactory::class, 'build')->getReturnType());
         self::assertNull(new \ReflectionMethod(ResponseFactory::class, 'build')->getReturnType());
         self::assertNull(new \ReflectionMethod(RequestBodyFactory::class, 'build')->getReturnType());
         self::assertNull(new \ReflectionMethod(SchemaFactory::class, 'build')->getReturnType());

@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace DummyNamespace;
+
+use Vyuldashev\LaravelOpenApi\Builders\Parameter;
+use Vyuldashev\LaravelOpenApi\Builders\Schema;
+use Vyuldashev\LaravelOpenApi\Factories\ParameterFactory;
+
+class DummyClass extends ParameterFactory
+{
+    public function build(): Parameter
+    {
+        return Parameter::query('DummyClass')
+            ->name('parameter-name')
+            ->description('Parameter description')
+            ->required(false)
+            ->schema(Schema::string());
+    }
+}

@@ -7,6 +7,7 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 use Illuminate\Support\Facades\App;
 use OpenApi\Annotations\Components;
 use Vyuldashev\LaravelOpenApi\Builders\Components\CallbacksBuilder;
+use Vyuldashev\LaravelOpenApi\Builders\Components\ParametersBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\RequestBodiesBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\ResponsesBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\SchemasBuilder;
@@ -19,6 +20,7 @@ class ComponentsBuilder
 {
     public function __construct(
         protected CallbacksBuilder $callbacksBuilder,
+        protected ParametersBuilder $parametersBuilder,
         protected RequestBodiesBuilder $requestBodiesBuilder,
         protected ResponsesBuilder $responsesBuilder,
         protected SchemasBuilder $schemasBuilder,
@@ -37,6 +39,7 @@ class ComponentsBuilder
         array $middlewares = [],
     ): ?Components {
         $callbacks = $this->callbacksBuilder->build($collection);
+        $parameters = $this->parametersBuilder->build($collection);
         $requestBodies = $this->requestBodiesBuilder->build($collection);
         $responses = $this->responsesBuilder->build($collection);
         $schemas = $this->schemasBuilder->build($collection);
@@ -50,6 +53,12 @@ class ComponentsBuilder
             $hasAnyObjects = true;
 
             $properties['callbacks'] = $this->callbacksToArray($callbacks);
+        }
+
+        if (\count($parameters) > 0) {
+            $hasAnyObjects = true;
+
+            $properties['parameters'] = $parameters;
         }
 
         if (\count($requestBodies) > 0) {

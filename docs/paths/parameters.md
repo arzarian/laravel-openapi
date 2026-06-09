@@ -8,6 +8,12 @@ You may generate a new one using Artisan command:
 php artisan openapi:make-parameters ListUsers
 ```
 
+For a single reusable parameter, generate a `ParameterFactory` instead:
+
+```bash
+php artisan openapi:make-parameter Slug
+```
+
 Here is an example of `Parameters` object factory:
 
 ```php
@@ -75,6 +81,55 @@ The following definition will be generated:
     }
 }
 ```
+
+## Reusable Parameters
+
+Parameters can be reusable. Add `Vyuldashev\LaravelOpenApi\Contracts\Reusable` to either a single `ParameterFactory` or a list `ParametersFactory`.
+
+```php
+use Vyuldashev\LaravelOpenApi\Contracts\Reusable;
+
+class SlugParameter extends ParameterFactory implements Reusable
+{
+    public function build(): Parameter
+    {
+        return Parameter::path('Slug')
+            ->name('slug')
+            ->required()
+            ->description('Slug')
+            ->schema(Schema::string());
+    }
+}
+```
+
+Then use it directly in an operation:
+
+```php
+#[OpenApi\Parameters(factory: SlugParameter::class)]
+public function show(string $slug)
+{
+    //
+}
+```
+
+Or compose it inside a reusable list:
+
+```php
+class MethodParameters extends ParametersFactory implements Reusable
+{
+    public function build(): array
+    {
+        return [
+            SlugParameter::ref('slug'),
+            Parameter::query('Page')
+                ->name('page')
+                ->schema(Schema::integer()),
+        ];
+    }
+}
+```
+
+Reusable parameters are added to `components.parameters`. Operations use `$ref` instead of inline parameter definitions.
 
 ## Route Parameters
  

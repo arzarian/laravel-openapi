@@ -23,7 +23,8 @@ class ModelColumnProvider
         return \array_values(collect(Schema::connection($model->getConnectionName())->getColumnListing($table))
             ->map(
                 /** @phpstan-ignore-next-line Laravel connection keeps this method when doctrine/dbal is installed for supported versions. */
-                static fn(string $column): Column => $connection->getDoctrineColumn($table, $column))
+                static fn(string $column): Column => $connection->getDoctrineColumn($table, $column),
+            )
             ->values()
             ->all());
     }

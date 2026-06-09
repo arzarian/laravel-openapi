@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Vyuldashev\LaravelOpenApi\Builders\Components\CallbacksBuilder;
+use Vyuldashev\LaravelOpenApi\Builders\Components\ParametersBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\RequestBodiesBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\ResponsesBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\SchemasBuilder;
@@ -31,6 +32,8 @@ class OpenApiServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(CallbacksBuilder::class, fn() => new CallbacksBuilder($this->getPathsFromConfig('callbacks')));
+
+        $this->app->bind(ParametersBuilder::class, fn() => new ParametersBuilder($this->getPathsFromConfig('parameters')));
 
         $this->app->bind(RequestBodiesBuilder::class, fn() => new RequestBodiesBuilder($this->getPathsFromConfig('request_bodies')));
 
@@ -66,6 +69,7 @@ class OpenApiServiceProvider extends ServiceProvider
             $this->commands([
                 Console\CallbackFactoryMakeCommand::class,
                 Console\ExtensionFactoryMakeCommand::class,
+                Console\ParameterFactoryMakeCommand::class,
                 Console\ParametersFactoryMakeCommand::class,
                 Console\RequestBodyFactoryMakeCommand::class,
                 Console\ResponseFactoryMakeCommand::class,

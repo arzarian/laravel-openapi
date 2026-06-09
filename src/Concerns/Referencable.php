@@ -13,6 +13,7 @@ use Vyuldashev\LaravelOpenApi\Builders\SecurityScheme;
 use Vyuldashev\LaravelOpenApi\Builders\SpecificationBuilder;
 use Vyuldashev\LaravelOpenApi\Contracts\Reusable;
 use Vyuldashev\LaravelOpenApi\Factories\CallbackFactory;
+use Vyuldashev\LaravelOpenApi\Factories\ParameterFactory;
 use Vyuldashev\LaravelOpenApi\Factories\ParametersFactory;
 use Vyuldashev\LaravelOpenApi\Factories\RequestBodyFactory;
 use Vyuldashev\LaravelOpenApi\Factories\ResponseFactory;
@@ -41,6 +42,9 @@ trait Referencable
         if ($instance instanceof CallbackFactory) {
             $baseRef = '#/components/callbacks/';
             $name = $serializer->componentName($instance->build(), 'name');
+        } elseif ($instance instanceof ParameterFactory) {
+            $baseRef = '#/components/parameters/';
+            $name = $serializer->componentName($instance->build(), 'parameter');
         } elseif ($instance instanceof ParametersFactory) {
             $baseRef = '#/components/parameters/';
             $name = $serializer->componentName($instance->build()[0], 'parameter');
@@ -61,6 +65,7 @@ trait Referencable
         $ref = $baseRef . $name;
 
         return match (true) {
+            $instance instanceof ParameterFactory => Parameter::ref($ref, $objectId),
             $instance instanceof ParametersFactory => Parameter::ref($ref, $objectId),
             $instance instanceof RequestBodyFactory => RequestBody::ref($ref, $objectId),
             $instance instanceof ResponseFactory => Response::ref($ref, $objectId),

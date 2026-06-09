@@ -7,6 +7,7 @@ namespace Vyuldashev\LaravelOpenApi\Support;
 use Illuminate\Support\Facades\App;
 use Vyuldashev\LaravelOpenApi\Factories\CallbackFactory;
 use Vyuldashev\LaravelOpenApi\Factories\ExtensionFactory;
+use Vyuldashev\LaravelOpenApi\Factories\ParameterFactory;
 use Vyuldashev\LaravelOpenApi\Factories\ParametersFactory;
 use Vyuldashev\LaravelOpenApi\Factories\RequestBodyFactory;
 use Vyuldashev\LaravelOpenApi\Factories\ResponseFactory;
@@ -34,11 +35,15 @@ class FactoryClassResolver
 
     /**
      * @param string $factory
-     * @return class-string<ParametersFactory>
+     * @return class-string<ParameterFactory|ParametersFactory>
      */
     public function parameters(string $factory): string
     {
-        return $this->resolve($factory, 'OpenApi\\Parameters\\', ParametersFactory::class, 'Factory class must be instance of ParametersFactory');
+        return $this->resolveParameter(
+            $factory,
+            'OpenApi\\Parameters\\',
+            'Factory class must be instance of ParameterFactory or ParametersFactory',
+        );
     }
 
     /**
@@ -87,6 +92,23 @@ class FactoryClassResolver
         $class = \class_exists($factory) ? $factory : App::getNamespace() . $namespace . $factory;
 
         if (!\is_a($class, $expected, true)) {
+            throw new \InvalidArgumentException($message);
+        }
+
+        return $class;
+    }
+
+    /**
+     * @param string $factory
+     * @param string $namespace
+     * @param string $message
+     * @return class-string<ParameterFactory|ParametersFactory>
+     */
+    private function resolveParameter(string $factory, string $namespace, string $message): string
+    {
+        $class = \class_exists($factory) ? $factory : App::getNamespace() . $namespace . $factory;
+
+        if (!\is_a($class, ParameterFactory::class, true) && !\is_a($class, ParametersFactory::class, true)) {
             throw new \InvalidArgumentException($message);
         }
 

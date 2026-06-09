@@ -70,6 +70,10 @@ return [
             app_path('OpenApi/Callbacks'),
         ],
 
+        'parameters' => [
+            app_path('OpenApi/Parameters'),
+        ],
+
         'request_bodies' => [
             app_path('OpenApi/RequestBodies'),
         ],

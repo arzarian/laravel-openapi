@@ -11,6 +11,8 @@ use OpenApi\Annotations\Parameter;
 use OpenApi\Annotations\Schema;
 use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use Vyuldashev\LaravelOpenApi\Attributes\Parameters;
+use Vyuldashev\LaravelOpenApi\Contracts\Reusable;
+use Vyuldashev\LaravelOpenApi\Factories\ParameterFactory;
 use Vyuldashev\LaravelOpenApi\Factories\ParametersFactory;
 use Vyuldashev\LaravelOpenApi\RouteInformation;
 use Vyuldashev\LaravelOpenApi\SchemaHelpers;
@@ -93,10 +95,18 @@ class ParametersBuilder
         $parameters = $route->actionAttributes->first(static fn(object $attribute) => $attribute instanceof Parameters);
 
         if ($parameters) {
-            /** @var ParametersFactory $parametersFactory */
+            /** @var ParameterFactory|ParametersFactory $parametersFactory */
             $parametersFactory = App::make($this->factoryClassResolver->parameters($parameters->factory));
+            $builtParameters = $this->factoryParameters($parametersFactory);
 
-            $serialized = $this->serializer->toArray($parametersFactory->build());
+            if ($parametersFactory instanceof Reusable) {
+                return collect($builtParameters)
+                    ->map(fn(mixed $parameter) => new Parameter([
+                        'ref' => $this->reference($parameter),
+                    ]));
+            }
+
+            $serialized = $this->serializer->toArray($builtParameters);
 
             $parameters = collect(\is_array($serialized) ? $serialized : [])
                 ->map(fn(array $parameter) => new Parameter($this->serializer->properties($parameter)))
@@ -104,5 +114,41 @@ class ParametersBuilder
         }
 
         return collect($parameters);
+    }
+
+    /**
+     * @return array<int, mixed>
+     * @param ParameterFactory|ParametersFactory $parametersFactory
+     */
+    protected function factoryParameters(ParameterFactory|ParametersFactory $parametersFactory): array
+    {
+        if ($parametersFactory instanceof ParameterFactory) {
+            return [$parametersFactory->build()];
+        }
+
+        return $parametersFactory->build();
+    }
+
+    protected function reference(mixed $parameter): ?string
+    {
+        $name = $this->serializer->componentName($parameter, 'parameter');
+
+        if ($name !== null) {
+            return '#/components/parameters/' . $name;
+        }
+
+        $parameterName = $this->serializer->property($parameter, 'name');
+
+        if (\is_string($parameterName) && $parameterName !== '') {
+            return '#/components/parameters/' . $parameterName;
+        }
+
+        $serialized = $this->serializer->toArray($parameter);
+
+        if (\is_array($serialized)) {
+            return $serialized['$ref'] ?? $serialized['ref'] ?? null;
+        }
+
+        return null;
     }
 }
