@@ -5,10 +5,10 @@ module.exports = {
   themeConfig: {
     nav: [
       {text: 'Home', link: '/'},
-      {text: 'GitHub', link: 'http://github.com/vyuldashev/laravel-openapi'},
+      {text: 'GitHub', link: 'https://github.com/arzarian/laravel-openapi'},
       {
         text: 'Packagist',
-        link: 'https://packagist.org/packages/vyuldashev/laravel-openapi',
+        link: 'https://packagist.org/packages/arzarian/laravel-openapi',
       },
     ],
     sidebar: [

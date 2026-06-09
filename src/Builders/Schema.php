@@ -142,7 +142,7 @@ class Schema extends SpecificationBuilder
         return $this->set('const', $value);
     }
 
-    public function items(Schema $items): static
+    public function items(self $items): static
     {
         return $this->set('items', $items);
     }
@@ -202,7 +202,7 @@ class Schema extends SpecificationBuilder
         return $this->set('multipleOf', $multipleOf);
     }
 
-    public function required(string|Schema ...$required): static
+    public function required(string|self ...$required): static
     {
         $required = \array_map(
             static fn(string|Schema $item): ?string => $item instanceof self ? $item->objectId : $item,
@@ -212,32 +212,32 @@ class Schema extends SpecificationBuilder
         return $this->set('required', $required ?: null);
     }
 
-    public function properties(Schema ...$properties): static
+    public function properties(self ...$properties): static
     {
         return $this->set('properties', $properties ?: null);
     }
 
-    public function allOf(Schema ...$schemas): static
+    public function allOf(self ...$schemas): static
     {
         return $this->set('allOf', $schemas ?: null);
     }
 
-    public function anyOf(Schema ...$schemas): static
+    public function anyOf(self ...$schemas): static
     {
         return $this->set('anyOf', $schemas ?: null);
     }
 
-    public function oneOf(Schema ...$schemas): static
+    public function oneOf(self ...$schemas): static
     {
         return $this->set('oneOf', $schemas ?: null);
     }
 
-    public function not(Schema $schema): static
+    public function not(self $schema): static
     {
         return $this->set('not', $schema);
     }
 
-    public function additionalProperties(bool|Schema $additionalProperties): static
+    public function additionalProperties(bool|self $additionalProperties): static
     {
         return $this->set('additionalProperties', $additionalProperties);
     }

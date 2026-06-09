@@ -1,5 +1,5 @@
 {
-    "name": "tartanlegrand/laravel-openapi",
+    "name": "arzarian/laravel-openapi",
     "description": "Generate OpenAPI Specification for Laravel Applications",
     "keywords": [
         "laravel",
@@ -14,8 +14,8 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Vladimir Yuldashev",
-            "email": "misterio92@gmail.com"
+            "name": "Ivan Kritskiy",
+            "email": "arzarian@mail.ru"
         }
     ],
     "require": {
@@ -29,7 +29,6 @@
     "require-dev": {
         "driftingly/rector-laravel": "^2.4",
         "larastan/larastan": "^3.10",
-        "laravel/boost": "^2.4",
         "laravel/pint": "^1.29",
         "orchestra/testbench": "^10.0|^11.0",
         "phpunit/phpunit": "^12.5"
