@@ -17,14 +17,18 @@ use Vyuldashev\LaravelOpenApi\Factories\ParametersFactory;
 use Vyuldashev\LaravelOpenApi\RouteInformation;
 use Vyuldashev\LaravelOpenApi\SchemaHelpers;
 use Vyuldashev\LaravelOpenApi\Support\FactoryClassResolver;
+use Vyuldashev\LaravelOpenApi\Support\OpenApi\ParameterComponentNameResolver;
 use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecificationObjectSerializer;
 
 class ParametersBuilder
 {
+    protected ParameterComponentNameResolver $nameResolver;
+
     public function __construct(
         protected SpecificationObjectSerializer $serializer,
         protected FactoryClassResolver $factoryClassResolver,
     ) {
+        $this->nameResolver = new ParameterComponentNameResolver($serializer);
     }
 
     /**
@@ -102,7 +106,7 @@ class ParametersBuilder
             if ($parametersFactory instanceof Reusable) {
                 return collect($builtParameters)
                     ->map(fn(mixed $parameter) => new Parameter([
-                        'ref' => $this->reference($parameter),
+                        'ref' => $this->reference($parametersFactory, $parameter),
                     ]));
             }
 
@@ -129,26 +133,16 @@ class ParametersBuilder
         return $parametersFactory->build();
     }
 
-    protected function reference(mixed $parameter): ?string
+    protected function reference(ParameterFactory|ParametersFactory $parametersFactory, mixed $parameter): ?string
     {
-        $name = $this->serializer->componentName($parameter, 'parameter');
-
-        if ($name !== null) {
-            return '#/components/parameters/' . $name;
+        if ($parametersFactory instanceof ParameterFactory) {
+            return '#/components/parameters/' . $this->nameResolver->forParameterFactory($parametersFactory, $parameter);
         }
 
-        $parameterName = $this->serializer->property($parameter, 'name');
-
-        if (\is_string($parameterName) && $parameterName !== '') {
-            return '#/components/parameters/' . $parameterName;
+        if ($this->nameResolver->isDirectReference($parameter)) {
+            return $this->nameResolver->referenceTarget($parameter);
         }
 
-        $serialized = $this->serializer->toArray($parameter);
-
-        if (\is_array($serialized)) {
-            return $serialized['$ref'] ?? $serialized['ref'] ?? null;
-        }
-
-        return null;
+        return '#/components/parameters/' . $this->nameResolver->forParametersFactory($parametersFactory, $parameter);
     }
 }

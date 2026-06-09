@@ -7,6 +7,11 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 use OpenApi\Annotations\AbstractAnnotation;
 use OpenApi\Generator;
 
+/**
+ * @property-read ?string $objectId
+ * @property-read ?string $ref
+ * @property-read array<string, mixed> $x
+ */
 abstract class SpecificationBuilder implements \JsonSerializable
 {
     protected ?string $ref = null;
@@ -208,7 +213,13 @@ abstract class SpecificationBuilder implements \JsonSerializable
         }
 
         if (\is_array($value)) {
-            return \array_map(fn(mixed $item): mixed => $this->normalize($item), $value);
+            $mapped = [];
+
+            foreach ($value as $itemKey => $item) {
+                $mapped[$itemKey] = $this->normalize($item, $stripIdentifier);
+            }
+
+            return $mapped;
         }
 
         return $value;
@@ -223,7 +234,7 @@ abstract class SpecificationBuilder implements \JsonSerializable
         $filtered = [];
 
         foreach ($properties as $key => $value) {
-            $value = $this->normalize($value);
+            $value = $this->normalize($value, true);
 
             if ($value === null || $value === [] || Generator::isDefault($value)) {
                 continue;

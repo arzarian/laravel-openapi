@@ -19,6 +19,7 @@ use Vyuldashev\LaravelOpenApi\Factories\RequestBodyFactory;
 use Vyuldashev\LaravelOpenApi\Factories\ResponseFactory;
 use Vyuldashev\LaravelOpenApi\Factories\SchemaFactory;
 use Vyuldashev\LaravelOpenApi\Factories\SecuritySchemeFactory;
+use Vyuldashev\LaravelOpenApi\Support\OpenApi\ParameterComponentNameResolver;
 use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecificationObjectSerializer;
 
 trait Referencable
@@ -37,6 +38,7 @@ trait Referencable
 
         $baseRef = null;
         $name = null;
+        $parameterNameResolver = new ParameterComponentNameResolver();
         $serializer = new SpecificationObjectSerializer();
 
         if ($instance instanceof CallbackFactory) {
@@ -44,10 +46,22 @@ trait Referencable
             $name = $serializer->componentName($instance->build(), 'name');
         } elseif ($instance instanceof ParameterFactory) {
             $baseRef = '#/components/parameters/';
-            $name = $serializer->componentName($instance->build(), 'parameter');
+            $parameter = $instance->build();
+            $name = $parameterNameResolver->forParameterFactory($instance, $parameter);
         } elseif ($instance instanceof ParametersFactory) {
+            $parameters = $instance->build();
+            $parameter = $parameters[0] ?? null;
+
+            if ($parameter === null) {
+                throw new \UnexpectedValueException('Parameters factory refs require at least one parameter.');
+            }
+
+            if ($parameterNameResolver->isDirectReference($parameter)) {
+                return Parameter::ref((string)$parameterNameResolver->referenceTarget($parameter), $objectId);
+            }
+
             $baseRef = '#/components/parameters/';
-            $name = $serializer->componentName($instance->build()[0], 'parameter');
+            $name = $parameterNameResolver->forParametersFactory($instance, $parameter);
         } elseif ($instance instanceof RequestBodyFactory) {
             $baseRef = '#/components/requestBodies/';
             $name = $serializer->componentName($instance->build(), 'request');

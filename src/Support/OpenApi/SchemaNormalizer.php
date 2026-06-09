@@ -120,6 +120,10 @@ class SchemaNormalizer
      */
     protected function isSchemaLike(array $value): bool
     {
+        if (\array_key_exists('type', $value) && $this->isSchemaType($value['type'])) {
+            return true;
+        }
+
         if ($this->isPropertiesMap($value)) {
             return false;
         }
@@ -160,7 +164,11 @@ class SchemaNormalizer
             return false;
         }
 
-        $exists = \array_any(
+        if (\array_all($value, fn($property) => \is_array($property) && $this->isSchemaLike($property))) {
+            return true;
+        }
+
+        return !\array_any(
             array: [
                 'additionalProperties',
                 'allOf',
@@ -179,11 +187,17 @@ class SchemaNormalizer
             ],
             callback: static fn(string $schemaKeyword): bool => \array_key_exists($schemaKeyword, $value),
         );
-        if ($exists) {
-            return false;
+    }
+
+    protected function isSchemaType(mixed $value): bool
+    {
+        if (\is_string($value)) {
+            return true;
         }
 
-        return \array_all($value, fn($property) => !(!\is_array($property) || !$this->isSchemaLike($property)));
+        return \is_array($value)
+            && \array_is_list($value)
+            && \array_all($value, static fn(mixed $type): bool => \is_string($type));
     }
 
     /**

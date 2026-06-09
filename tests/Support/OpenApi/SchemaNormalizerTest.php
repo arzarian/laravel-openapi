@@ -219,6 +219,55 @@ class SchemaNormalizerTest extends TestCase
         ));
     }
 
+    public function testPropertyMapWithTypePropertyWithoutSchemaKeywordsKeepsPropertyName(): void
+    {
+        // Проверяет, что имя property не считается schema type без schema keywords.
+        $specification = [
+            'components' => [
+                'schemas' => [
+                    'Example' => [
+                        'properties' => [
+                            'type' => [
+                                'description' => 'Тип',
+                            ],
+                        ],
+                        'type' => 'object',
+                    ],
+                ],
+            ],
+        ];
+
+        self::assertSame($specification, $this->normalizer()->normalize(
+            $specification,
+            new SpecVersion('3.0.4'),
+        ));
+    }
+
+    public function testTypeOnlySchemaIsNormalizedAsSchema(): void
+    {
+        // Проверяет, что type-only schema не считается properties map.
+        $specification = $this->normalizer()->normalize([
+            'components' => [
+                'schemas' => [
+                    'Example' => [
+                        'type' => ['string', 'null'],
+                    ],
+                ],
+            ],
+        ], new SpecVersion('3.0.4'));
+
+        self::assertSame([
+            'components' => [
+                'schemas' => [
+                    'Example' => [
+                        'type' => 'string',
+                        'nullable' => true,
+                    ],
+                ],
+            ],
+        ], $specification);
+    }
+
     public function testPropertyMapWithTypePropertyFromBuilderKeepsPropertyName(): void
     {
         $schema = Schema::object('Example')->properties(

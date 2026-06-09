@@ -45,7 +45,7 @@ class SpecificationObjectSerializer
     public function property(mixed $object, string $property): mixed
     {
         if (\is_array($object)) {
-            return $object[$property] ?? $object['objectId'] ?? null;
+            return $object[$property] ?? null;
         }
 
         if (! \is_object($object)) {

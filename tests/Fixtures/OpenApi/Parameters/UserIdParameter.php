@@ -2,21 +2,20 @@
 
 declare(strict_types=1);
 
-namespace DummyNamespace;
+namespace Vyuldashev\LaravelOpenApi\Tests\Fixtures\OpenApi\Parameters;
 
 use Vyuldashev\LaravelOpenApi\Builders\Parameter;
 use Vyuldashev\LaravelOpenApi\Builders\Schema;
 use Vyuldashev\LaravelOpenApi\Contracts\Reusable;
 use Vyuldashev\LaravelOpenApi\Factories\ParameterFactory;
 
-class DummyClass extends ParameterFactory implements Reusable
+class UserIdParameter extends ParameterFactory implements Reusable
 {
     public function build(): Parameter
     {
-        return Parameter::query('DummyClass')
-            ->name('parameter-name')
-            ->description('Parameter description')
-            ->required(false)
+        return Parameter::query()
+            ->name('user_id')
+            ->description('User id parameter')
             ->schema(Schema::string());
     }
 }

@@ -131,6 +131,16 @@ class MethodParameters extends ParametersFactory implements Reusable
 
 Reusable parameters are added to `components.parameters`. Operations use `$ref` instead of inline parameter definitions.
 
+When a reusable `ParametersFactory` builds inline parameters without explicit object IDs, component names are scoped by the factory class and generated in PascalCase. For example, `UserIndexParameters` with `Parameter::query()->name('page')` generates `UserIndexParametersPage`.
+
+Explicit object IDs are preserved exactly:
+
+```php
+Parameter::query('user_id')->name('user_id')
+```
+
+generates `#/components/parameters/user_id`.
+
 ## Route Parameters
  
 Let's assume we have route `Route::get('/users/{user}', 'UserController@show')`. 

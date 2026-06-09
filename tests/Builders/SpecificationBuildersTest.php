@@ -112,6 +112,35 @@ class SpecificationBuildersTest extends TestCase
         ], $schema->toArray());
     }
 
+    public function testSchemaPropertiesPreserveAssociativeKeysWhenPropertyIsNamedType(): void
+    {
+        $schema = Schema::object()
+            ->properties(
+                Schema::string('type')
+                    ->description('Тип')
+                    ->enum('type1', 'type2', 'type3'),
+                Schema::string('title')
+                    ->description('Заголовок')
+                    ->example('Заголовок'),
+            );
+
+        self::assertSame([
+            'properties' => [
+                'type' => [
+                    'description' => 'Тип',
+                    'type' => 'string',
+                    'enum' => ['type1', 'type2', 'type3'],
+                ],
+                'title' => [
+                    'description' => 'Заголовок',
+                    'type' => 'string',
+                    'example' => 'Заголовок',
+                ],
+            ],
+            'type' => 'object',
+        ], $schema->toArray());
+    }
+
     public function testSchemaRefKeepsSiblingAttributes(): void
     {
         self::assertSame([
@@ -274,6 +303,27 @@ class SpecificationBuildersTest extends TestCase
         ], Server::create()
             ->url('https://api.example.com')
             ->description('Production')
+            ->toArray());
+    }
+
+    public function testNestedSchemaObjectIdsAreNotSerializedInsideParameters(): void
+    {
+        self::assertSame([
+            'parameter' => 'RequestsFilesToken',
+            'in' => 'query',
+            'required' => true,
+            'description' => 'Уникальный токен для загрузки файлов',
+            'schema' => [
+                'type' => 'string',
+                'format' => Schema::FORMAT_UUID,
+            ],
+        ], Parameter::query('RequestsFilesToken')
+            ->required()
+            ->description('Уникальный токен для загрузки файлов')
+            ->schema(
+                Schema::string('token')
+                    ->format(Schema::FORMAT_UUID),
+            )
             ->toArray());
     }
 
