@@ -1,17 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Encoding as SwaggerEncoding;
 
-/**
- * @property-read ?string $property
- * @property-read ?string $contentType
- * @property-read list<mixed> $headers
- * @property-read ?string $style
- * @property-read ?bool $explode
- * @property-read ?bool $allowReserved
- */
 class Encoding extends SpecificationBuilder
 {
     public function property(?string $property): static
@@ -44,9 +38,13 @@ class Encoding extends SpecificationBuilder
         return $this->set('allowReserved', $allowReserved);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     protected function build(): array
     {
-        return array_merge(parent::build(), [
+        return \array_merge(parent::build(), [
             'headers' => $this->keyedBy('headers', 'header') ?: null,
         ]);
     }

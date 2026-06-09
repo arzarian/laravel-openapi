@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Console;
 
 use Illuminate\Console\GeneratorCommand;
@@ -11,23 +13,26 @@ class RequestBodyFactoryMakeCommand extends GeneratorCommand
     protected $description = 'Create a new RequestBody factory class';
     protected $type = 'RequestBody';
 
+    #[\Override]
     protected function buildClass($name)
     {
         $output = parent::buildClass($name);
 
-        return str_replace('DummyRequestBody', Str::replaceLast('RequestBody', '', class_basename($name)), $output);
+        return \str_replace('DummyRequestBody', Str::replaceLast('RequestBody', '', class_basename($name)), $output);
     }
 
     protected function getStub(): string
     {
-        return __DIR__.'/stubs/requestbody.stub';
+        return __DIR__ . '/stubs/requestbody.stub';
     }
 
+    #[\Override]
     protected function getDefaultNamespace($rootNamespace): string
     {
-        return $rootNamespace.'\OpenApi\RequestBodies';
+        return $rootNamespace . '\OpenApi\RequestBodies';
     }
 
+    #[\Override]
     protected function qualifyClass($name): string
     {
         $name = parent::qualifyClass($name);
@@ -36,6 +41,6 @@ class RequestBodyFactoryMakeCommand extends GeneratorCommand
             return $name;
         }
 
-        return $name.'RequestBody';
+        return $name . 'RequestBody';
     }
 }

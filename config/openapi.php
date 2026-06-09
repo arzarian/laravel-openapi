@@ -1,11 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 return [
-
     'collections' => [
-
         'default' => [
-
             'openapi' => env('OPENAPI_SPEC_VERSION', '3.0.0'),
 
             'info' => [
@@ -24,12 +23,10 @@ return [
             ],
 
             'tags' => [
-
                 // [
                 //    'name' => 'user',
                 //    'description' => 'Application users',
                 // ],
-
             ],
 
             'security' => [
@@ -64,9 +61,7 @@ return [
                     //
                 ],
             ],
-
         ],
-
     ],
 
     // Directories to use for locating OpenAPI object definitions.
@@ -91,5 +86,4 @@ return [
             app_path('OpenApi/SecuritySchemes'),
         ],
     ],
-
 ];

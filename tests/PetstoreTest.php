@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Tests;
 
 use Examples\Petstore\PetController;
@@ -12,18 +14,11 @@ class PetstoreTest extends TestCase
 {
     protected function setUp(): void
     {
-        putenv('APP_URL=http://petstore.swagger.io/v1');
+        \putenv('APP_URL=http://petstore.swagger.io/v1');
 
         parent::setUp();
 
         Route::get('/pets', [PetController::class, 'index']);
-    }
-
-    protected function getEnvironmentSetUp($app): void
-    {
-        $app['config']->set('openapi.locations.schemas', [
-            __DIR__.'/../examples/petstore/OpenApi/Schemas',
-        ]);
     }
 
     public function testGenerate(): void
@@ -86,7 +81,7 @@ class PetstoreTest extends TestCase
     {
         config()->set('openapi.collections.default.openapi', '3.1.2');
         config()->set('openapi.locations.schemas', [
-            __DIR__.'/../examples/petstore/OpenApi31/Schemas',
+            __DIR__ . '/../examples/petstore/OpenApi31/Schemas',
         ]);
 
         $spec = $this->generateArray();
@@ -104,5 +99,12 @@ class PetstoreTest extends TestCase
             ],
             'type' => 'object',
         ], $spec['components']['schemas']['PetStatus']);
+    }
+
+    protected function getEnvironmentSetUp($app): void
+    {
+        $app['config']->set('openapi.locations.schemas', [
+            __DIR__ . '/../examples/petstore/OpenApi/Schemas',
+        ]);
     }
 }

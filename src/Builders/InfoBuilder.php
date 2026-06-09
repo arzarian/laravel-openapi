@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use Illuminate\Support\Arr;
@@ -10,14 +12,16 @@ use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecificationObjectSerializer;
 
 class InfoBuilder
 {
+    protected SpecificationObjectSerializer $serializer;
     public function __construct(
-        ?SpecificationObjectSerializer $serializer = null
+        ?SpecificationObjectSerializer $serializer = null,
     ) {
         $this->serializer = $serializer ?? new SpecificationObjectSerializer();
     }
 
-    protected SpecificationObjectSerializer $serializer;
-
+    /**
+     * @param array<string, mixed> $config
+     */
     public function build(array $config): Info
     {
         $properties = [
@@ -26,17 +30,17 @@ class InfoBuilder
             'version' => Arr::get($config, 'version'),
         ];
 
-        if (Arr::has($config, 'contact') &&
-            (
-                array_key_exists('name', $config['contact']) ||
-                array_key_exists('email', $config['contact']) ||
-                array_key_exists('url', $config['contact'])
+        if (Arr::has($config, 'contact')
+            && (
+                \array_key_exists('name', $config['contact'])
+                || \array_key_exists('email', $config['contact'])
+                || \array_key_exists('url', $config['contact'])
             )
         ) {
             $properties['contact'] = $this->buildContact($config['contact']);
         }
 
-        if (Arr::has($config, 'license') && array_key_exists('name', $config['license'])) {
+        if (Arr::has($config, 'license') && \array_key_exists('name', $config['license'])) {
             $properties['license'] = $this->buildLicense($config['license']);
         }
 
@@ -45,6 +49,9 @@ class InfoBuilder
         return new Info($this->serializer->properties($properties));
     }
 
+    /**
+     * @param array<string, mixed> $config
+     */
     protected function buildContact(array $config): Contact
     {
         return new Contact($this->serializer->properties([
@@ -54,6 +61,9 @@ class InfoBuilder
         ]));
     }
 
+    /**
+     * @param array<string, mixed> $config
+     */
     protected function buildLicense(array $config): License
     {
         return new License($this->serializer->properties([

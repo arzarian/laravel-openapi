@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Attributes;
 
-use Attribute;
-
-#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
 class Collection
 {
-    /** @var string|array<string> */
-    public array|string $name;
-
-    public function __construct(string|array $name = 'default')
-    {
-        $this->name = $name;
+    public function __construct(
+        /** @var string|array<string> */
+        public array|string $name = 'default',
+    ) {
     }
 }

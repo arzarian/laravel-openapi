@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Examples\Petstore;
 
 use Examples\Petstore\OpenApi\Parameters\ListPetsParameters;
@@ -15,7 +17,7 @@ class PetController
     #[OpenApi\Operation('listPets')]
     #[OpenApi\Parameters(ListPetsParameters::class)]
     #[OpenApi\Response(ErrorValidationResponse::class, 422)]
-    public function index()
+    public function index(): void
     {
     }
 }

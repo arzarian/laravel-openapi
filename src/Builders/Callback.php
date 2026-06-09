@@ -1,13 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Attachable;
 
-/**
- * @property-read ?string $name
- * @property-read array<string, mixed> $callbacks
- */
 class Callback extends SpecificationBuilder
 {
     public function name(?string $name): static
@@ -23,6 +21,10 @@ class Callback extends SpecificationBuilder
         return $this->set('callbacks', $callbacks);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     protected function build(): array
     {
         return $this->properties['callbacks'] ?? [];

@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Concerns;
 
-use InvalidArgumentException;
+use Illuminate\Support\Facades\App;
 use Vyuldashev\LaravelOpenApi\Builders\Parameter;
 use Vyuldashev\LaravelOpenApi\Builders\RequestBody;
 use Vyuldashev\LaravelOpenApi\Builders\Response;
@@ -20,12 +22,16 @@ use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecificationObjectSerializer;
 
 trait Referencable
 {
+    /**
+     * @return SpecificationBuilder|array<string, string>
+     * @param ?string $objectId
+     */
     public static function ref(?string $objectId = null): SpecificationBuilder|array
     {
-        $instance = app(static::class);
+        $instance = App::make(static::class);
 
         if (! $instance instanceof Reusable) {
-            throw new InvalidArgumentException('"'.static::class.'" must implement "'.Reusable::class.'" in order to be referencable.');
+            throw new \InvalidArgumentException('"' . static::class . '" must implement "' . Reusable::class . '" in order to be referencable.');
         }
 
         $baseRef = null;
@@ -34,7 +40,7 @@ trait Referencable
 
         if ($instance instanceof CallbackFactory) {
             $baseRef = '#/components/callbacks/';
-            $name = $instance->build()->name;
+            $name = $serializer->componentName($instance->build(), 'name');
         } elseif ($instance instanceof ParametersFactory) {
             $baseRef = '#/components/parameters/';
             $name = $serializer->componentName($instance->build()[0], 'parameter');
@@ -52,7 +58,7 @@ trait Referencable
             $name = $serializer->componentName($instance->build(), 'securityScheme');
         }
 
-        $ref = $baseRef.$name;
+        $ref = $baseRef . $name;
 
         return match (true) {
             $instance instanceof ParametersFactory => Parameter::ref($ref, $objectId),

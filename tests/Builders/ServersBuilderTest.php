@@ -10,14 +10,6 @@ use Vyuldashev\LaravelOpenApi\Tests\TestCase;
 
 class ServersBuilderTest extends TestCase
 {
-    #[DataProvider('providerBuild')]
-    public function testBuild(array $config, array $expected): void
-    {
-        $SUT = new ServersBuilder();
-        $servers = $SUT->build($config);
-        $this->assertSameAssociativeArray($expected[0], json_decode($servers[0]->toJson(), true));
-    }
-
     public static function providerBuild(): array
     {
         return [
@@ -120,25 +112,33 @@ class ServersBuilderTest extends TestCase
             ],
         ];
     }
+    #[DataProvider('providerBuild')]
+    public function testBuild(array $config, array $expected): void
+    {
+        $SUT = new ServersBuilder();
+        $servers = $SUT->build($config);
+        $this->assertSameAssociativeArray($expected[0], \json_decode($servers[0]->toJson(), true));
+    }
 
     /**
      * Assert equality as an associative array.
      *
-     * @param  array  $expected
-     * @param  array  $actual
+     * @param array $expected
+     * @param array $actual
      * @return void
      */
     protected function assertSameAssociativeArray(array $expected, array $actual): void
     {
         foreach ($expected as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $this->assertSameAssociativeArray($value, $actual[$key]);
                 unset($actual[$key]);
+
                 continue;
             }
             self::assertSame($value, $actual[$key]);
             unset($actual[$key]);
         }
-        self::assertCount(0, $actual, sprintf('[%s] does not matched keys.', join(', ', array_keys($actual))));
+        self::assertCount(0, $actual, \sprintf('[%s] does not matched keys.', \join(', ', \array_keys($actual))));
     }
 }

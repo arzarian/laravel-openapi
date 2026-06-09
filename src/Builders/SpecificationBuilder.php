@@ -7,11 +7,6 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 use OpenApi\Annotations\AbstractAnnotation;
 use OpenApi\Generator;
 
-/**
- * @property-read ?string $objectId
- * @property-read ?string $ref
- * @property-read array<string, mixed> $x
- */
 abstract class SpecificationBuilder implements \JsonSerializable
 {
     protected ?string $ref = null;

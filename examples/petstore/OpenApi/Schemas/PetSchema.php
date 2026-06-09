@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Examples\Petstore\OpenApi\Schemas;
 
 use Vyuldashev\LaravelOpenApi\Builders\Schema;

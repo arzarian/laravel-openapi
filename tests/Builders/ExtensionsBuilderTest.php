@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Tests\Builders;
 
 use OpenApi\Annotations\Get;
@@ -23,7 +25,7 @@ class ExtensionsBuilderTest extends TestCase
 
         self::assertSame([
             'x-uuid' => ['type' => 'string', 'format' => 'uuid'],
-        ], json_decode($operation->toJson(), true));
+        ], \json_decode($operation->toJson(), true));
     }
 
     public function testBuildUsingKeyValue(): void
@@ -40,7 +42,7 @@ class ExtensionsBuilderTest extends TestCase
         self::assertSame([
             'x-foo' => 'bar',
             'x-key' => '1',
-        ], json_decode($operation->toJson(), true));
+        ], \json_decode($operation->toJson(), true));
     }
 }
 
@@ -52,7 +54,7 @@ class FakeExtension extends ExtensionFactory
     }
 
     /**
-     * @return string|null|array
+     * @return string|array|null
      */
     public function value()
     {

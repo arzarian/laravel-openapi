@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vyuldashev\LaravelOpenApi\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Config;
 use Vyuldashev\LaravelOpenApi\Generator;
 
 class GenerateCommand extends Command
@@ -14,17 +15,21 @@ class GenerateCommand extends Command
 
     public function handle(Generator $generator): void
     {
-        $collectionExists = collect(config('openapi.collections'))->has($this->argument('collection'));
+        $collection = (string)$this->argument('collection');
+        $output = (string)$this->option('output');
 
-        if (! $collectionExists) {
-            $this->error('Collection "'.$this->argument('collection').'" does not exist.');
+        $collections = Config::get('openapi.collections');
+        $collectionExists = \is_array($collections) && collect($collections)->has($collection);
+
+        if (!$collectionExists) {
+            $this->error('Collection "' . $collection . '" does not exist.');
 
             return;
         }
 
-        if ($this->option('output')) {
+        if ($output) {
             //create file if not exists, or overwrite if exists and put the generated JSON there
-            file_put_contents($this->option('output'), $generator->generate($this->argument('collection'))->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            \file_put_contents($output, $generator->generate($collection)->toJson(\JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE));
 
             $this->info('OpenAPI specification generated successfully.');
 
@@ -32,8 +37,8 @@ class GenerateCommand extends Command
         }
         $this->line(
             $generator
-                ->generate($this->argument('collection'))
-                ->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+                ->generate($collection)
+                ->toJson(\JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE),
         );
     }
 }

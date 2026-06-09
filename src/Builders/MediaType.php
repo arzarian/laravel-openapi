@@ -1,26 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\MediaType as SwaggerMediaType;
 
-/**
- * @property-read ?string $mediaType
- * @property-read mixed $schema
- * @property-read mixed $example
- * @property-read list<mixed> $examples
- * @property-read list<mixed> $encoding
- */
 class MediaType extends SpecificationBuilder
 {
-    public const MEDIA_TYPE_APPLICATION_JSON = 'application/json';
-    public const MEDIA_TYPE_APPLICATION_PDF = 'application/pdf';
-    public const MEDIA_TYPE_IMAGE_JPEG = 'image/jpeg';
-    public const MEDIA_TYPE_IMAGE_PNG = 'image/png';
-    public const MEDIA_TYPE_TEXT_CALENDAR = 'text/calendar';
-    public const MEDIA_TYPE_TEXT_PLAIN = 'text/plain';
-    public const MEDIA_TYPE_TEXT_XML = 'text/xml';
-    public const MEDIA_TYPE_APPLICATION_X_WWW_FORM_URLENCODED = 'application/x-www-form-urlencoded';
+    public const string MEDIA_TYPE_APPLICATION_JSON = 'application/json';
+    public const string MEDIA_TYPE_APPLICATION_PDF = 'application/pdf';
+    public const string MEDIA_TYPE_IMAGE_JPEG = 'image/jpeg';
+    public const string MEDIA_TYPE_IMAGE_PNG = 'image/png';
+    public const string MEDIA_TYPE_TEXT_CALENDAR = 'text/calendar';
+    public const string MEDIA_TYPE_TEXT_PLAIN = 'text/plain';
+    public const string MEDIA_TYPE_TEXT_XML = 'text/xml';
+    public const string MEDIA_TYPE_APPLICATION_X_WWW_FORM_URLENCODED = 'application/x-www-form-urlencoded';
 
     public static function json(?string $objectId = null): static
     {
@@ -87,9 +82,13 @@ class MediaType extends SpecificationBuilder
         return $this->set('encoding', $encoding ?: null);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     protected function build(): array
     {
-        return array_merge(parent::build(), [
+        return \array_merge(parent::build(), [
             'examples' => $this->keyedBy('examples', 'example') ?: null,
             'encoding' => $this->keyedBy('encoding', 'property') ?: null,
         ]);

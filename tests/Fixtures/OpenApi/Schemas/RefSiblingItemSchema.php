@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Tests\Fixtures\OpenApi\Schemas;
 
 use Vyuldashev\LaravelOpenApi\Builders\Schema;

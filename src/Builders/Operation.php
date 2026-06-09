@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\AbstractAnnotation;
@@ -12,24 +14,19 @@ use OpenApi\Annotations\Post;
 use OpenApi\Annotations\Put;
 use OpenApi\Annotations\Trace;
 
-/**
- * @property-read ?string $method
- * @property-read ?string $summary
- * @property-read ?string $description
- * @property-read list<string> $tags
- * @property-read mixed $externalDocs
- * @property-read ?string $operationId
- * @property-read ?bool $deprecated
- * @property-read list<mixed> $parameters
- * @property-read mixed $requestBody
- * @property-read list<mixed> $responses
- * @property-read list<mixed> $callbacks
- * @property-read list<array<string, mixed>> $security
- * @property-read list<mixed> $servers
- */
 class Operation extends SpecificationBuilder
 {
     protected ?string $method = null;
+
+    #[\Override]
+    public function __get(string $name): mixed
+    {
+        if ($name === 'method') {
+            return $this->method;
+        }
+
+        return parent::__get($name);
+    }
 
     public static function get(?string $objectId = null): static
     {
@@ -134,6 +131,9 @@ class Operation extends SpecificationBuilder
         return $this->set('callbacks', $callbacks ?: null);
     }
 
+    /**
+     * @param array<string, mixed> ...$security
+     */
     public function security(array ...$security): static
     {
         return $this->set('security', $security ?: null);
@@ -149,6 +149,7 @@ class Operation extends SpecificationBuilder
         return $this->set('servers', $servers ?: null);
     }
 
+    #[\Override]
     public function toAnnotation(): AbstractAnnotation
     {
         $class = match ($this->method) {
@@ -165,18 +166,13 @@ class Operation extends SpecificationBuilder
         return new $class($this->toArray());
     }
 
-    public function __get(string $name): mixed
-    {
-        if ($name === 'method') {
-            return $this->method;
-        }
-
-        return parent::__get($name);
-    }
-
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     protected function build(): array
     {
-        return array_merge(parent::build(), [
+        return \array_merge(parent::build(), [
             'responses' => $this->keyedBy('responses', 'response') ?: null,
             'callbacks' => $this->keyedBy('callbacks', 'name') ?: null,
         ]);

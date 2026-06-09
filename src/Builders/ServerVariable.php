@@ -1,15 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\ServerVariable as SwaggerServerVariable;
 
-/**
- * @property-read ?string $serverVariable
- * @property-read list<mixed> $enum
- * @property-read mixed $default
- * @property-read ?string $description
- */
 class ServerVariable extends SpecificationBuilder
 {
     public function enum(mixed ...$enum): static

@@ -1,23 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Header as SwaggerHeader;
 
-/**
- * @property-read ?string $header
- * @property-read ?string $description
- * @property-read ?bool $required
- * @property-read mixed $schema
- * @property-read mixed $example
- * @property-read list<mixed> $examples
- * @property-read list<mixed> $content
- * @property-read ?bool $deprecated
- * @property-read ?bool $allowEmptyValue
- * @property-read ?string $style
- * @property-read ?bool $explode
- * @property-read ?bool $allowReserved
- */
 class Header extends SpecificationBuilder
 {
     public function description(?string $description): static
@@ -75,9 +63,13 @@ class Header extends SpecificationBuilder
         return $this->set('allowReserved', $allowReserved);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     protected function build(): array
     {
-        return array_merge(parent::build(), [
+        return \array_merge(parent::build(), [
             'examples' => $this->keyedBy('examples', 'example') ?: null,
             'content' => $this->keyedBy('content', 'mediaType') ?: null,
         ]);

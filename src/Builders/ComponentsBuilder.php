@@ -1,44 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
+use Illuminate\Support\Facades\App;
 use OpenApi\Annotations\Components;
 use Vyuldashev\LaravelOpenApi\Builders\Components\CallbacksBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\RequestBodiesBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\ResponsesBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\SchemasBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\SecuritySchemesBuilder;
+use Vyuldashev\LaravelOpenApi\Contracts\ComponentMiddleware;
 use Vyuldashev\LaravelOpenApi\Generator;
 use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecificationObjectSerializer;
 
 class ComponentsBuilder
 {
-    protected CallbacksBuilder $callbacksBuilder;
-    protected RequestBodiesBuilder $requestBodiesBuilder;
-    protected ResponsesBuilder $responsesBuilder;
-    protected SchemasBuilder $schemasBuilder;
-    protected SecuritySchemesBuilder $securitySchemesBuilder;
-    protected SpecificationObjectSerializer $serializer;
-
     public function __construct(
-        CallbacksBuilder $callbacksBuilder,
-        RequestBodiesBuilder $requestBodiesBuilder,
-        ResponsesBuilder $responsesBuilder,
-        SchemasBuilder $schemasBuilder,
-        SecuritySchemesBuilder $securitySchemesBuilder,
-        SpecificationObjectSerializer $serializer
+        protected CallbacksBuilder $callbacksBuilder,
+        protected RequestBodiesBuilder $requestBodiesBuilder,
+        protected ResponsesBuilder $responsesBuilder,
+        protected SchemasBuilder $schemasBuilder,
+        protected SecuritySchemesBuilder $securitySchemesBuilder,
+        protected SpecificationObjectSerializer $serializer,
     ) {
-        $this->callbacksBuilder = $callbacksBuilder;
-        $this->requestBodiesBuilder = $requestBodiesBuilder;
-        $this->responsesBuilder = $responsesBuilder;
-        $this->schemasBuilder = $schemasBuilder;
-        $this->securitySchemesBuilder = $securitySchemesBuilder;
-        $this->serializer = $serializer;
     }
 
+    /**
+     * @param string $collection
+     * @param list<class-string<ComponentMiddleware>> $middlewares
+     * @return Components|null
+     */
     public function build(
         string $collection = Generator::COLLECTION_DEFAULT,
-        array $middlewares = []
+        array $middlewares = [],
     ): ?Components {
         $callbacks = $this->callbacksBuilder->build($collection);
         $requestBodies = $this->requestBodiesBuilder->build($collection);
@@ -50,46 +46,51 @@ class ComponentsBuilder
 
         $hasAnyObjects = false;
 
-        if (count($callbacks) > 0) {
+        if (\count($callbacks) > 0) {
             $hasAnyObjects = true;
 
             $properties['callbacks'] = $this->callbacksToArray($callbacks);
         }
 
-        if (count($requestBodies) > 0) {
+        if (\count($requestBodies) > 0) {
             $hasAnyObjects = true;
 
             $properties['requestBodies'] = $requestBodies;
         }
 
-        if (count($responses) > 0) {
+        if (\count($responses) > 0) {
             $hasAnyObjects = true;
             $properties['responses'] = $responses;
         }
 
-        if (count($schemas) > 0) {
+        if (\count($schemas) > 0) {
             $hasAnyObjects = true;
             $properties['schemas'] = $schemas;
         }
 
-        if (count($securitySchemes) > 0) {
+        if (\count($securitySchemes) > 0) {
             $hasAnyObjects = true;
             $properties['securitySchemes'] = $securitySchemes;
         }
 
-        if (! $hasAnyObjects) {
+        if (!$hasAnyObjects) {
             return null;
         }
 
         $components = new Components($properties);
 
         foreach ($middlewares as $middleware) {
-            app($middleware)->after($components);
+            /** @var class-string<ComponentMiddleware> $middleware */
+            App::make($middleware)->after($components);
         }
 
         return $components;
     }
 
+    /**
+     * @param array<int, mixed> $callbacks
+     * @return array<string, mixed>
+     */
     protected function callbacksToArray(array $callbacks): array
     {
         $mapped = [];

@@ -1,14 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\License as SwaggerLicense;
 
-/**
- * @property-read ?string $name
- * @property-read ?string $url
- * @property-read ?string $identifier
- */
 class License extends SpecificationBuilder
 {
     public function name(?string $name): static

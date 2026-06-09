@@ -1,39 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Parameter as SwaggerParameter;
 
-/**
- * @property-read ?string $name
- * @property-read ?string $parameter
- * @property-read ?string $in
- * @property-read ?string $description
- * @property-read ?bool $required
- * @property-read ?bool $deprecated
- * @property-read ?bool $allowEmptyValue
- * @property-read ?string $style
- * @property-read ?bool $explode
- * @property-read ?bool $allowReserved
- * @property-read mixed $schema
- * @property-read mixed $example
- * @property-read list<mixed> $examples
- * @property-read list<mixed> $content
- */
 class Parameter extends SpecificationBuilder
 {
-    public const IN_QUERY = 'query';
-    public const IN_HEADER = 'header';
-    public const IN_PATH = 'path';
-    public const IN_COOKIE = 'cookie';
+    public const string IN_QUERY = 'query';
+    public const string IN_HEADER = 'header';
+    public const string IN_PATH = 'path';
+    public const string IN_COOKIE = 'cookie';
 
-    public const STYLE_MATRIX = 'matrix';
-    public const STYLE_LABEL = 'label';
-    public const STYLE_FORM = 'form';
-    public const STYLE_SIMPLE = 'simple';
-    public const STYLE_SPACE_DELIMITED = 'spaceDelimited';
-    public const STYLE_PIPE_DELIMITED = 'pipeDelimited';
-    public const STYLE_DEEP_OBJECT = 'deepObject';
+    public const string STYLE_MATRIX = 'matrix';
+    public const string STYLE_LABEL = 'label';
+    public const string STYLE_FORM = 'form';
+    public const string STYLE_SIMPLE = 'simple';
+    public const string STYLE_SPACE_DELIMITED = 'spaceDelimited';
+    public const string STYLE_PIPE_DELIMITED = 'pipeDelimited';
+    public const string STYLE_DEEP_OBJECT = 'deepObject';
 
     public static function query(?string $objectId = null): static
     {
@@ -120,9 +106,13 @@ class Parameter extends SpecificationBuilder
         return $this->set('content', $content ?: null);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     protected function build(): array
     {
-        return array_merge(parent::build(), [
+        return \array_merge(parent::build(), [
             'content' => $this->keyedBy('content', 'mediaType') ?: null,
             'examples' => $this->keyedBy('examples', 'example') ?: null,
         ]);

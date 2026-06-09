@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi;
 
 use OpenApi\Annotations\Schema;
-use ReflectionType;
 
 class SchemaHelpers
 {
-    public static function guessFromReflectionType(ReflectionType $reflectionType): Schema
+    public static function guessFromReflectionType(\ReflectionType $reflectionType): Schema
     {
-        switch ($reflectionType->getName()) {
-            case 'int':
-                return new Schema(['type' => 'integer']);
-            case 'bool':
-                return new Schema(['type' => 'boolean']);
+        if (!$reflectionType instanceof \ReflectionNamedType) {
+            return new Schema(['type' => 'string']);
         }
 
-        return new Schema(['type' => 'string']);
+        return match ($reflectionType->getName()) {
+            'int' => new Schema(['type' => 'integer']),
+            'bool' => new Schema(['type' => 'boolean']),
+            default => new Schema(['type' => 'string']),
+        };
     }
 }

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders\Paths;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use OpenApi\Annotations\Delete;
@@ -28,37 +31,20 @@ use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecificationObjectSerializer;
 
 class OperationsBuilder
 {
-    protected CallbacksBuilder $callbacksBuilder;
-    protected ParametersBuilder $parametersBuilder;
-    protected RequestBodyBuilder $requestBodyBuilder;
-    protected ResponsesBuilder $responsesBuilder;
-    protected ExtensionsBuilder $extensionsBuilder;
-    protected SecurityBuilder $securityBuilder;
-    protected SpecificationObjectSerializer $serializer;
-
     public function __construct(
-        CallbacksBuilder   $callbacksBuilder,
-        ParametersBuilder  $parametersBuilder,
-        RequestBodyBuilder $requestBodyBuilder,
-        ResponsesBuilder   $responsesBuilder,
-        ExtensionsBuilder  $extensionsBuilder,
-        SecurityBuilder    $securityBuilder,
-        SpecificationObjectSerializer $serializer
-    )
-    {
-        $this->callbacksBuilder = $callbacksBuilder;
-        $this->parametersBuilder = $parametersBuilder;
-        $this->requestBodyBuilder = $requestBodyBuilder;
-        $this->responsesBuilder = $responsesBuilder;
-        $this->extensionsBuilder = $extensionsBuilder;
-        $this->securityBuilder = $securityBuilder;
-        $this->serializer = $serializer;
+        protected CallbacksBuilder $callbacksBuilder,
+        protected ParametersBuilder $parametersBuilder,
+        protected RequestBodyBuilder $requestBodyBuilder,
+        protected ResponsesBuilder $responsesBuilder,
+        protected ExtensionsBuilder $extensionsBuilder,
+        protected SecurityBuilder $securityBuilder,
+        protected SpecificationObjectSerializer $serializer,
+    ) {
     }
 
     /**
-     * @param RouteInformation[]|Collection $routes
-     * @return array
-     *
+     * @param array<int, RouteInformation>|Collection<int, RouteInformation> $routes
+     * @return array<int, Operation>
      */
     public function build(array|Collection $routes): array
     {
@@ -70,11 +56,15 @@ class OperationsBuilder
             $operationAttribute = $route->actionAttributes
                 ->first(static fn(object $attribute) => $attribute instanceof OperationAttribute);
 
+            if (!$operationAttribute instanceof OperationAttribute) {
+                continue;
+            }
+
             $operationId = optional($operationAttribute)->id;
-            $tags = $operationAttribute->tags ?? [];
-            $servers = collect($operationAttribute->servers)
-                ->filter(fn($server) => app($server) instanceof ServerFactory)
-                ->map(static fn($server) => app($server)->build())
+            $tags = $operationAttribute->tags;
+            $servers = collect($operationAttribute->servers ?? [])
+                ->filter(static fn(string $server): bool => App::make($server) instanceof ServerFactory)
+                ->map(static fn(string $server): mixed => App::make($server)->build())
                 ->toArray();
 
             $parameters = $this->parametersBuilder->build($route);
@@ -86,8 +76,8 @@ class OperationsBuilder
             $properties = [
                 'tags' => $tags,
                 'deprecated' => $this->isDeprecated($route->actionDocBlock),
-                'description' => $route->actionDocBlock->getDescription()->render() !== '' ? $route->actionDocBlock->getDescription()->render() : null,
-                'summary' => $route->actionDocBlock->getSummary() !== '' ? $route->actionDocBlock->getSummary() : null,
+                'description' => $route->actionDocBlock?->getDescription()->render() !== '' ? $route->actionDocBlock?->getDescription()->render() : null,
+                'summary' => $route->actionDocBlock?->getSummary() !== '' ? $route->actionDocBlock?->getSummary() : null,
                 'operationId' => $operationId,
                 'parameters' => $parameters,
                 'requestBody' => $requestBody,
@@ -104,8 +94,8 @@ class OperationsBuilder
             }
 
             $operation = $this->makeOperation(
-                Str::lower($operationAttribute->method) ?: $route->method,
-                $properties
+                Str::lower($operationAttribute->method ?? '') ?: $route->method,
+                $properties,
             );
 
             $this->extensionsBuilder->build($operation, $route->actionAttributes);
@@ -116,6 +106,10 @@ class OperationsBuilder
         return $operations;
     }
 
+    /**
+     * @param array<string, mixed> $properties
+     * @param string $method
+     */
     protected function makeOperation(string $method, array $properties): Operation
     {
         return match ($method) {
@@ -131,6 +125,10 @@ class OperationsBuilder
         };
     }
 
+    /**
+     * @param array<int, mixed> $callbacks
+     * @return array<int|string, mixed>
+     */
     protected function callbacksToArray(array $callbacks): array
     {
         $serialized = [];
@@ -138,13 +136,15 @@ class OperationsBuilder
         foreach ($callbacks as $callback) {
             if ($callback instanceof CallbackDefinition) {
                 $serialized[$callback->name] = $this->serializer->toArray($callback);
+
                 continue;
             }
 
             $callback = $this->serializer->toArray($callback);
 
-            if (array_key_exists('$ref', $callback)) {
+            if (\array_key_exists('$ref', $callback)) {
                 $serialized[] = $callback;
+
                 continue;
             }
 
@@ -167,7 +167,7 @@ class OperationsBuilder
 
         $deprecatedTag = $actionDocBlock->getTagsByName('deprecated');
 
-        if (count($deprecatedTag) > 0) {
+        if (\count($deprecatedTag) > 0) {
             return true;
         }
 

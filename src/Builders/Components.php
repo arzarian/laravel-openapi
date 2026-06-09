@@ -1,20 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Components as SwaggerComponents;
 
-/**
- * @property-read list<mixed> $schemas
- * @property-read list<mixed> $responses
- * @property-read list<mixed> $parameters
- * @property-read list<mixed> $examples
- * @property-read list<mixed> $requestBodies
- * @property-read list<mixed> $headers
- * @property-read list<mixed> $securitySchemes
- * @property-read list<mixed> $links
- * @property-read list<mixed> $callbacks
- */
 class Components extends SpecificationBuilder
 {
     public function schemas(mixed ...$schemas): static
@@ -62,9 +53,13 @@ class Components extends SpecificationBuilder
         return $this->set('callbacks', $callbacks ?: null);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     protected function build(): array
     {
-        return array_merge(parent::build(), [
+        return \array_merge(parent::build(), [
             'schemas' => $this->keyedBy('schemas', 'schema') ?: null,
             'responses' => $this->keyedBy('responses', 'response') ?: null,
             'parameters' => $this->keyedBy('parameters', 'parameter') ?: null,

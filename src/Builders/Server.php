@@ -1,14 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Server as SwaggerServer;
 
-/**
- * @property-read ?string $url
- * @property-read ?string $description
- * @property-read list<mixed> $variables
- */
 class Server extends SpecificationBuilder
 {
     public function url(?string $url): static
@@ -26,9 +23,13 @@ class Server extends SpecificationBuilder
         return $this->set('variables', $variables ?: null);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     protected function build(): array
     {
-        return array_merge(parent::build(), [
+        return \array_merge(parent::build(), [
             'variables' => $this->keyedBy('variables', 'serverVariable') ?: null,
         ]);
     }

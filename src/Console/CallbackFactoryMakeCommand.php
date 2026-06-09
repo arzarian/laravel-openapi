@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Console;
 
 use Illuminate\Console\GeneratorCommand;
@@ -13,14 +15,16 @@ class CallbackFactoryMakeCommand extends GeneratorCommand
 
     protected function getStub(): string
     {
-        return __DIR__.'/stubs/callback.stub';
+        return __DIR__ . '/stubs/callback.stub';
     }
 
+    #[\Override]
     protected function getDefaultNamespace($rootNamespace): string
     {
-        return $rootNamespace.'\OpenApi\Callbacks';
+        return $rootNamespace . '\OpenApi\Callbacks';
     }
 
+    #[\Override]
     protected function qualifyClass($name): string
     {
         $name = parent::qualifyClass($name);
@@ -29,6 +33,6 @@ class CallbackFactoryMakeCommand extends GeneratorCommand
             return $name;
         }
 
-        return $name.'Callback';
+        return $name . 'Callback';
     }
 }

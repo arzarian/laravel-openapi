@@ -1,25 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\PathItem as SwaggerPathItem;
 
-/**
- * @property-read mixed $get
- * @property-read mixed $post
- * @property-read mixed $put
- * @property-read mixed $patch
- * @property-read mixed $delete
- * @property-read mixed $options
- * @property-read mixed $head
- * @property-read mixed $trace
- * @property-read ?string $path
- * @property-read ?string $summary
- * @property-read ?string $description
- * @property-read list<mixed> $operations
- * @property-read list<mixed> $servers
- * @property-read list<mixed> $parameters
- */
 class PathItem extends SpecificationBuilder
 {
     public function get(mixed $operation): static

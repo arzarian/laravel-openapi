@@ -1,13 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Attachable;
 
-/**
- * @property-read ?string $securityScheme
- * @property-read list<string> $scopes
- */
 class SecurityRequirement extends SpecificationBuilder
 {
     public function securityScheme(?string $securityScheme): static
@@ -20,6 +18,10 @@ class SecurityRequirement extends SpecificationBuilder
         return $this->set('scopes', $scopes);
     }
 
+    /**
+     * @return array<string, list<string>>
+     */
+    #[\Override]
     public function toArray(): array
     {
         if ($this->objectId === null) {

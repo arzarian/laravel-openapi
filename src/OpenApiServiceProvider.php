@@ -6,6 +6,7 @@ namespace Vyuldashev\LaravelOpenApi;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Vyuldashev\LaravelOpenApi\Builders\Components\CallbacksBuilder;
 use Vyuldashev\LaravelOpenApi\Builders\Components\RequestBodiesBuilder;
@@ -21,35 +22,30 @@ use Vyuldashev\LaravelOpenApi\Support\OpenApi\OpenApiFactory;
 
 class OpenApiServiceProvider extends ServiceProvider
 {
+    #[\Override]
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/openapi.php',
-            'openapi'
+            __DIR__ . '/../config/openapi.php',
+            'openapi',
         );
 
-        $this->app->bind(CallbacksBuilder::class, function () {
-            return new CallbacksBuilder($this->getPathsFromConfig('callbacks'));
-        });
+        $this->app->bind(CallbacksBuilder::class, fn() => new CallbacksBuilder($this->getPathsFromConfig('callbacks')));
 
-        $this->app->bind(RequestBodiesBuilder::class, function () {
-            return new RequestBodiesBuilder($this->getPathsFromConfig('request_bodies'));
-        });
+        $this->app->bind(RequestBodiesBuilder::class, fn() => new RequestBodiesBuilder($this->getPathsFromConfig('request_bodies')));
 
-        $this->app->bind(ResponsesBuilder::class, function () {
-            return new ResponsesBuilder($this->getPathsFromConfig('responses'));
-        });
+        $this->app->bind(ResponsesBuilder::class, fn() => new ResponsesBuilder($this->getPathsFromConfig('responses')));
 
-        $this->app->bind(SchemasBuilder::class, function () {
-            return new SchemasBuilder($this->getPathsFromConfig('schemas'));
-        });
+        $this->app->bind(SchemasBuilder::class, fn() => new SchemasBuilder($this->getPathsFromConfig('schemas')));
 
-        $this->app->bind(SecuritySchemesBuilder::class, function () {
-            return new SecuritySchemesBuilder($this->getPathsFromConfig('security_schemes'));
-        });
+        $this->app->bind(SecuritySchemesBuilder::class, fn() => new SecuritySchemesBuilder($this->getPathsFromConfig('security_schemes')));
 
-        $this->app->singleton(Generator::class, static function (Application $app) {
-            $config = config('openapi');
+        $this->app->singleton(static function (Application $app): Generator {
+            $config = Config::get('openapi');
+
+            if (!\is_array($config)) {
+                $config = [];
+            }
 
             return new Generator(
                 $config,
@@ -58,7 +54,7 @@ class OpenApiServiceProvider extends ServiceProvider
                 $app->make(TagsBuilder::class),
                 $app->make(PathsBuilder::class),
                 $app->make(ComponentsBuilder::class),
-                $app->make(OpenApiFactory::class)
+                $app->make(OpenApiFactory::class),
             );
         });
 
@@ -83,24 +79,40 @@ class OpenApiServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/openapi.php' => config_path('openapi.php'),
+                __DIR__ . '/../config/openapi.php' => config_path('openapi.php'),
             ], 'openapi-config');
         }
 
-        $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+        $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
     }
 
+    /**
+     * @return array<int, string>
+     * @param string $type
+     */
     private function getPathsFromConfig(string $type): array
     {
-        $directories = config('openapi.locations.'.$type, []);
+        $directories = Config::get('openapi.locations.' . $type, []);
 
-        foreach ($directories as &$directory) {
-            $directory = glob($directory, GLOB_ONLYDIR);
+        if (!\is_array($directories)) {
+            return [];
         }
 
-        return (new Collection($directories))
+        foreach ($directories as &$directory) {
+            if (!\is_string($directory)) {
+                $directory = [];
+
+                continue;
+            }
+
+            $directory = \glob($directory, \GLOB_ONLYDIR) ?: [];
+        }
+
+        return new Collection($directories)
             ->flatten()
             ->unique()
-            ->toArray();
+            ->filter(static fn(mixed $path): bool => \is_string($path))
+            ->values()
+            ->all();
     }
 }

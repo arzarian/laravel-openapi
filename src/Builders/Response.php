@@ -1,17 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Response as SwaggerResponse;
 
-/**
- * @property-read int|string|null $response
- * @property-read ?int $statusCode
- * @property-read ?string $description
- * @property-read list<mixed> $headers
- * @property-read list<mixed> $content
- * @property-read list<mixed> $links
- */
 class Response extends SpecificationBuilder
 {
     protected const STATUSES = [
@@ -83,6 +77,15 @@ class Response extends SpecificationBuilder
         return static::fromStatus('internalServerError', $objectId);
     }
 
+    protected static function fromStatus(string $name, ?string $objectId = null): static
+    {
+        [$statusCode, $description] = static::STATUSES[$name];
+
+        return static::create($objectId)
+            ->statusCode($statusCode)
+            ->description($description);
+    }
+
     public function statusCode(?int $statusCode): static
     {
         return $this->set('statusCode', $statusCode);
@@ -108,18 +111,26 @@ class Response extends SpecificationBuilder
         return $this->set('links', $links ?: null);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     protected function build(): array
     {
         $properties = parent::build();
         unset($properties['statusCode']);
 
-        return array_merge($properties, [
+        return \array_merge($properties, [
             'content' => $this->keyedBy('content', 'mediaType') ?: null,
             'headers' => $this->keyedBy('headers', 'header') ?: null,
             'links' => $this->keyedBy('links', 'link') ?: null,
         ]);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     protected function identifierProperties(): array
     {
         return [
@@ -127,6 +138,7 @@ class Response extends SpecificationBuilder
         ];
     }
 
+    #[\Override]
     protected function identifierValue(): mixed
     {
         return $this->properties['statusCode'] ?? $this->objectId;
@@ -140,14 +152,5 @@ class Response extends SpecificationBuilder
     protected function annotationClass(): string
     {
         return SwaggerResponse::class;
-    }
-
-    protected static function fromStatus(string $name, ?string $objectId = null): static
-    {
-        [$statusCode, $description] = static::STATUSES[$name];
-
-        return static::create($objectId)
-            ->statusCode($statusCode)
-            ->description($description);
     }
 }

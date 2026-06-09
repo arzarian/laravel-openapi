@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Tests;
 
 use OpenApi\Annotations\OpenApi;
@@ -22,6 +24,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function generateArray(): array
     {
-        return json_decode($this->generate()->toJson(), true);
+        return \json_decode($this->generate()->toJson(), true);
     }
 }

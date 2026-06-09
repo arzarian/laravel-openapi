@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Console;
 
 use Illuminate\Console\GeneratorCommand;
@@ -13,14 +15,16 @@ class ParametersFactoryMakeCommand extends GeneratorCommand
 
     protected function getStub(): string
     {
-        return __DIR__.'/stubs/parameters.stub';
+        return __DIR__ . '/stubs/parameters.stub';
     }
 
+    #[\Override]
     protected function getDefaultNamespace($rootNamespace): string
     {
-        return $rootNamespace.'\OpenApi\Parameters';
+        return $rootNamespace . '\OpenApi\Parameters';
     }
 
+    #[\Override]
     protected function qualifyClass($name): string
     {
         $name = parent::qualifyClass($name);
@@ -29,6 +33,6 @@ class ParametersFactoryMakeCommand extends GeneratorCommand
             return $name;
         }
 
-        return $name.'Parameters';
+        return $name . 'Parameters';
     }
 }

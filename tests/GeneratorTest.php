@@ -1,8 +1,8 @@
 <?php
 
-namespace Vyuldashev\LaravelOpenApi\Tests;
+declare(strict_types=1);
 
-use InvalidArgumentException;
+namespace Vyuldashev\LaravelOpenApi\Tests;
 
 class GeneratorTest extends TestCase
 {
@@ -24,7 +24,7 @@ class GeneratorTest extends TestCase
     {
         config()->set('openapi.collections.default.openapi', '3.2.0');
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unsupported OpenAPI version [3.2.0]. Supported versions: 3.0.x, 3.1.x.');
 
         $this->generate();
@@ -34,7 +34,7 @@ class GeneratorTest extends TestCase
     {
         config()->set('openapi.collections.default.openapi', '3.0.4');
         config()->set('openapi.locations.schemas', [
-            __DIR__.'/Fixtures/OpenApi/Schemas',
+            __DIR__ . '/Fixtures/OpenApi/Schemas',
         ]);
 
         $spec = $this->generateArray();
@@ -53,7 +53,7 @@ class GeneratorTest extends TestCase
     {
         config()->set('openapi.collections.default.openapi', '3.1.2');
         config()->set('openapi.locations.schemas', [
-            __DIR__.'/Fixtures/OpenApi/Schemas',
+            __DIR__ . '/Fixtures/OpenApi/Schemas',
         ]);
 
         $spec = $this->generateArray();

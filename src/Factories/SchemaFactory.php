@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Factories;
 
 use Vyuldashev\LaravelOpenApi\Concerns\Referencable;
@@ -11,13 +13,19 @@ abstract class SchemaFactory
         ref as protected makeRef;
     }
 
-    public static function ref(?string $objectId = null): SchemaBuilder
-    {
-        return static::makeRef($objectId);
-    }
-
     /**
-     * @return SchemaBuilder|\OpenApi\Annotations\Schema|array
+     * @return SchemaBuilder|\OpenApi\Annotations\Schema|array<string, mixed>
      */
     abstract public function build();
+
+    public static function ref(?string $objectId = null): SchemaBuilder
+    {
+        $ref = static::makeRef($objectId);
+
+        if (!$ref instanceof SchemaBuilder) {
+            throw new \UnexpectedValueException('Schema factory refs must resolve to a schema builder.');
+        }
+
+        return $ref;
+    }
 }

@@ -1,16 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Support\OpenApi;
 
-use InvalidArgumentException;
 use OpenApi\Annotations\OpenApi as SwaggerOpenApi;
 
-final class SpecVersion
+final readonly class SpecVersion
 {
-    public const DEFAULT = SwaggerOpenApi::VERSION_3_0_0;
+    public const string DEFAULT = SwaggerOpenApi::VERSION_3_0_0;
 
     public function __construct(
-        public readonly string $value
+        public string $value,
     ) {
         self::assertSupported($value);
     }
@@ -21,38 +22,41 @@ final class SpecVersion
             return new self(self::DEFAULT);
         }
 
-        return new self((string) $value);
+        return new self((string)$value);
     }
 
     public static function assertSupported(string $value): void
     {
-        if (! preg_match('/^3\.(0|1)\.\d+$/', $value)) {
-            throw new InvalidArgumentException(sprintf(
+        if (!\preg_match('/^3\.([01])\.\d+$/', $value)) {
+            throw new \InvalidArgumentException(\sprintf(
                 'Unsupported OpenAPI version [%s]. Supported versions: 3.0.x, 3.1.x.',
-                $value
+                $value,
             ));
         }
 
-        if (! in_array($value, SwaggerOpenApi::SUPPORTED_VERSIONS, true)) {
-            throw new InvalidArgumentException(sprintf(
+        if (!\in_array($value, SwaggerOpenApi::SUPPORTED_VERSIONS, true)) {
+            throw new \InvalidArgumentException(\sprintf(
                 'Unsupported OpenAPI version [%s]. Supported versions: %s.',
                 $value,
-                implode(', ', self::supported())
+                \implode(', ', self::supported()),
             ));
         }
     }
 
+    /**
+     * @return list<string>
+     */
     public static function supported(): array
     {
-        return array_values(array_filter(
+        return \array_values(\array_filter(
             SwaggerOpenApi::SUPPORTED_VERSIONS,
-            static fn (string $version): bool => str_starts_with($version, '3.0.')
-                || str_starts_with($version, '3.1.')
+            static fn(string $version): bool => \str_starts_with($version, '3.0.')
+                || \str_starts_with($version, '3.1.'),
         ));
     }
 
     public function isOpenApi31(): bool
     {
-        return str_starts_with($this->value, '3.1.');
+        return \str_starts_with($this->value, '3.1.');
     }
 }

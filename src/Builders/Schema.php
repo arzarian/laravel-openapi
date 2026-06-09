@@ -1,28 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Schema as SwaggerSchema;
 
 class Schema extends SpecificationBuilder
 {
-    public const TYPE_ARRAY = 'array';
-    public const TYPE_BOOLEAN = 'boolean';
-    public const TYPE_INTEGER = 'integer';
-    public const TYPE_NUMBER = 'number';
-    public const TYPE_OBJECT = 'object';
-    public const TYPE_STRING = 'string';
+    public const string TYPE_ARRAY = 'array';
+    public const string TYPE_BOOLEAN = 'boolean';
+    public const string TYPE_INTEGER = 'integer';
+    public const string TYPE_NUMBER = 'number';
+    public const string TYPE_OBJECT = 'object';
+    public const string TYPE_STRING = 'string';
 
-    public const FORMAT_INT32 = 'int32';
-    public const FORMAT_INT64 = 'int64';
-    public const FORMAT_FLOAT = 'float';
-    public const FORMAT_DOUBLE = 'double';
-    public const FORMAT_BYTE = 'byte';
-    public const FORMAT_BINARY = 'binary';
-    public const FORMAT_DATE = 'date';
-    public const FORMAT_DATE_TIME = 'date-time';
-    public const FORMAT_PASSWORD = 'password';
-    public const FORMAT_UUID = 'uuid';
+    public const string FORMAT_INT32 = 'int32';
+    public const string FORMAT_INT64 = 'int64';
+    public const string FORMAT_FLOAT = 'float';
+    public const string FORMAT_DOUBLE = 'double';
+    public const string FORMAT_BYTE = 'byte';
+    public const string FORMAT_BINARY = 'binary';
+    public const string FORMAT_DATE = 'date';
+    public const string FORMAT_DATE_TIME = 'date-time';
+    public const string FORMAT_PASSWORD = 'password';
+    public const string FORMAT_UUID = 'uuid';
 
     public static function array(?string $objectId = null): static
     {
@@ -79,6 +81,9 @@ class Schema extends SpecificationBuilder
         return $this->set('format', $format);
     }
 
+    /**
+     * @param string|list<string>|null $type
+     */
     public function type(string|array|null $type): static
     {
         return $this->set('type', $type);
@@ -86,7 +91,7 @@ class Schema extends SpecificationBuilder
 
     public function types(string ...$types): static
     {
-        return $this->type($types);
+        return $this->type(\array_values($types));
     }
 
     public function nullOr(string $type): static
@@ -161,9 +166,9 @@ class Schema extends SpecificationBuilder
 
     public function required(mixed ...$required): static
     {
-        $required = array_map(
-            static fn (mixed $item): mixed => $item instanceof self ? $item->objectId : $item,
-            $required
+        $required = \array_map(
+            static fn(mixed $item): mixed => $item instanceof self ? $item->objectId : $item,
+            $required,
         );
 
         return $this->set('required', $required ?: null);
@@ -249,6 +254,10 @@ class Schema extends SpecificationBuilder
         return $this->set('deprecated', $deprecated);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     public function toArray(): array
     {
         if ($this->ref === null) {
@@ -262,12 +271,16 @@ class Schema extends SpecificationBuilder
             return ['$ref' => $this->ref];
         }
 
-        return array_merge(['$ref' => $this->ref], $properties);
+        return \array_merge(['$ref' => $this->ref], $properties);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     protected function build(): array
     {
-        return array_merge($this->identifierProperties(), [
+        return \array_merge($this->identifierProperties(), [
             'title' => $this->properties['title'] ?? null,
             'description' => $this->properties['description'] ?? null,
             'maxProperties' => $this->properties['maxProperties'] ?? null,

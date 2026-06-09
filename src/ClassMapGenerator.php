@@ -1,23 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi;
 
 use Iterator;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 
 class ClassMapGenerator
 {
     /**
      * Iterate over all files in the given directory searching for classes.
      *
-     * @param  Iterator|string  $dir  The directory to search in or an iterator
-     * @return array A class map array
+     * @param \Iterator|string $dir The directory to search in or an iterator
+     * @return array<class-string, string> A class map array
      */
-    public static function createMap(Iterator|string $dir): array
+    public static function createMap(\Iterator|string $dir): array
     {
-        if (is_string($dir)) {
-            $dir = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
+        if (\is_string($dir)) {
+            $dir = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
         }
 
         $map = [];
@@ -29,16 +29,11 @@ class ClassMapGenerator
 
             $path = $file->getRealPath() ?: $file->getPathname();
 
-            if ('php' !== pathinfo($path, PATHINFO_EXTENSION)) {
+            if ('php' !== \pathinfo((string)$path, \PATHINFO_EXTENSION)) {
                 continue;
             }
 
             $classes = self::findClasses($path);
-
-            if (PHP_VERSION_ID >= 70000) {
-                // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
-                gc_mem_caches();
-            }
 
             foreach ($classes as $class) {
                 $map[$class] = $path;
@@ -51,17 +46,21 @@ class ClassMapGenerator
     /**
      * Extract the classes in the given file.
      *
-     * @param  string  $path  The file to check
-     * @return array The found classes
+     * @param string $path The file to check
+     * @return list<class-string> The found classes
      */
     private static function findClasses(string $path): array
     {
-        $contents = file_get_contents($path);
-        $tokens = token_get_all($contents);
+        $contents = \file_get_contents($path);
 
-        $nsTokens = [T_STRING => true, T_NS_SEPARATOR => true];
-        if (defined('T_NAME_QUALIFIED')) {
-            $nsTokens[T_NAME_QUALIFIED] = true;
+        if ($contents === false) {
+            return [];
+        }
+        $tokens = \token_get_all($contents);
+
+        $nsTokens = [\T_STRING => true, \T_NS_SEPARATOR => true];
+        if (\defined('T_NAME_QUALIFIED')) {
+            $nsTokens[\T_NAME_QUALIFIED] = true;
         }
 
         $classes = [];
@@ -77,7 +76,7 @@ class ClassMapGenerator
             $class = '';
 
             switch ($token[0]) {
-                case T_NAMESPACE:
+                case \T_NAMESPACE:
                     $namespace = '';
                     // If there is a namespace, extract it
                     while (isset($tokens[++$i][1])) {
@@ -86,10 +85,11 @@ class ClassMapGenerator
                         }
                     }
                     $namespace .= '\\';
+
                     break;
-                case T_CLASS:
-                case T_INTERFACE:
-                case T_TRAIT:
+                case \T_CLASS:
+                case \T_INTERFACE:
+                case \T_TRAIT:
                     // Skip usage of ::class constant
                     $isClassConstant = false;
                     for ($j = $i - 1; $j > 0; $j--) {
@@ -97,12 +97,13 @@ class ClassMapGenerator
                             break;
                         }
 
-                        if (T_DOUBLE_COLON === $tokens[$j][0]) {
+                        if (\T_DOUBLE_COLON === $tokens[$j][0]) {
                             $isClassConstant = true;
+
                             break;
                         }
 
-                        if (! in_array($tokens[$j][0], [T_WHITESPACE, T_DOC_COMMENT, T_COMMENT], true)) {
+                        if (! \in_array($tokens[$j][0], [\T_WHITESPACE, \T_DOC_COMMENT, \T_COMMENT], true)) {
                             break;
                         }
                     }
@@ -114,14 +115,20 @@ class ClassMapGenerator
                     // Find the classname
                     while (isset($tokens[++$i][1])) {
                         $t = $tokens[$i];
-                        if (T_STRING === $t[0]) {
+                        if (\T_STRING === $t[0]) {
                             $class .= $t[1];
-                        } elseif ('' !== $class && T_WHITESPACE === $t[0]) {
+                        } elseif ('' !== $class && \T_WHITESPACE === $t[0]) {
                             break;
                         }
                     }
 
-                    $classes[] = ltrim($namespace.$class, '\\');
+                    $className = \ltrim($namespace . $class, '\\');
+
+                    if (\class_exists($className) || \interface_exists($className) || \trait_exists($className)) {
+                        /** @var class-string $className */
+                        $classes[] = $className;
+                    }
+
                     break;
                 default:
                     break;

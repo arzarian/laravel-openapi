@@ -1,30 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\SecurityScheme as SwaggerSecurityScheme;
 
-/**
- * @property-read ?string $securityScheme
- * @property-read ?string $type
- * @property-read ?string $description
- * @property-read ?string $name
- * @property-read ?string $in
- * @property-read ?string $scheme
- * @property-read ?string $bearerFormat
- * @property-read list<mixed> $flows
- * @property-read ?string $openIdConnectUrl
- */
 class SecurityScheme extends SpecificationBuilder
 {
-    public const TYPE_API_KEY = 'apiKey';
-    public const TYPE_HTTP = 'http';
-    public const TYPE_OAUTH2 = 'oauth2';
-    public const TYPE_OPEN_ID_CONNECT = 'openIdConnect';
+    public const string TYPE_API_KEY = 'apiKey';
+    public const string TYPE_HTTP = 'http';
+    public const string TYPE_OAUTH2 = 'oauth2';
+    public const string TYPE_OPEN_ID_CONNECT = 'openIdConnect';
 
-    public const IN_QUERY = 'query';
-    public const IN_HEADER = 'header';
-    public const IN_COOKIE = 'cookie';
+    public const string IN_QUERY = 'query';
+    public const string IN_HEADER = 'header';
+    public const string IN_COOKIE = 'cookie';
 
     public static function oauth2(?string $objectId = null): static
     {
@@ -71,9 +62,13 @@ class SecurityScheme extends SpecificationBuilder
         return $this->set('openIdConnectUrl', $openIdConnectUrl);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     protected function build(): array
     {
-        return array_merge(parent::build(), [
+        return \array_merge(parent::build(), [
             'flows' => $this->keyedBy('flows', 'flow') ?: null,
         ]);
     }

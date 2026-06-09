@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Tests\Builders;
 
 use OpenApi\Annotations\SecurityScheme;
@@ -28,16 +30,16 @@ class SecurityBuilderTest extends TestCase
             'in' => 'header',
             'bearerFormat' => 'JWT',
             'scheme' => 'bearer',
-        ], json_decode($testJwtScheme->toJson(), true));
+        ], \json_decode($testJwtScheme->toJson(), true));
     }
 
     /**
      * We're just verifying that the builder is capable of
      * adding security information to the operation.
      */
-    public function testWeCanAddOperationSecurityUsingBuilder()
+    public function testWeCanAddOperationSecurityUsingBuilder(): void
     {
-        $routeInfo = new RouteInformation;
+        $routeInfo = new RouteInformation();
         $routeInfo->action = 'get';
         $routeInfo->name = 'test route';
         $routeInfo->actionAttributes = collect([
@@ -59,9 +61,9 @@ class SecurityBuilderTest extends TestCase
      * He's the main part of the PR. It's not possible to turn
      * off security for an operation.
      */
-    public function testWeCanAddTurnOffOperationSecurityUsingBuilder()
+    public function testWeCanAddTurnOffOperationSecurityUsingBuilder(): void
     {
-        $routeInfo = new RouteInformation;
+        $routeInfo = new RouteInformation();
         $routeInfo->parameters = collect();
         $routeInfo->action = 'foo';
         $routeInfo->method = 'get';
@@ -84,7 +86,7 @@ class SecurityBuilderTest extends TestCase
         self::assertSame([
             'summary' => 'Test',
             'security' => [],
-        ], json_decode($operations[0]->toJson(), true));
+        ], \json_decode((string)$operations[0]->toJson(), true));
     }
 }
 

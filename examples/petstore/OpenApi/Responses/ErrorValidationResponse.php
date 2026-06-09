@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Examples\Petstore\OpenApi\Responses;
 
 use Vyuldashev\LaravelOpenApi\Builders\MediaType;
@@ -16,15 +18,15 @@ class ErrorValidationResponse extends ResponseFactory implements Reusable
             Schema::string('message')->example('The given data was invalid.'),
             Schema::object('errors')
                 ->additionalProperties(
-                    Schema::array()->items(Schema::string())
+                    Schema::array()->items(Schema::string()),
                 )
-                ->example(['field' => ['Something is wrong with this field!']])
+                ->example(['field' => ['Something is wrong with this field!']]),
         );
 
         return Response::create('ErrorValidation')
             ->description('Validation errors')
             ->content(
-                MediaType::json()->schema($response)
+                MediaType::json()->schema($response),
             );
     }
 }

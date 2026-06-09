@@ -1,17 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Info as SwaggerInfo;
 
-/**
- * @property-read ?string $title
- * @property-read ?string $description
- * @property-read ?string $termsOfService
- * @property-read mixed $contact
- * @property-read mixed $license
- * @property-read ?string $version
- */
 class Info extends SpecificationBuilder
 {
     public function title(?string $title): static

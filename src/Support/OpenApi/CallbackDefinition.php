@@ -1,19 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Support\OpenApi;
 
-use JsonSerializable;
 use OpenApi\Annotations\PathItem;
 
-class CallbackDefinition implements JsonSerializable
+readonly class CallbackDefinition implements \JsonSerializable
 {
     public function __construct(
-        public readonly string $name,
-        public readonly string $expression,
-        public readonly PathItem|array $pathItem
+        public string $name,
+        public string $expression,
+        /** @var PathItem|array<string, mixed> */
+        public PathItem|array $pathItem,
     ) {
     }
 
+    /**
+     * @return array<string, PathItem|array<string, mixed>>
+     */
     public function jsonSerialize(): array
     {
         return [

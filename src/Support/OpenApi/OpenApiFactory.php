@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Support\OpenApi;
 
 use OpenApi\Annotations\OpenApi as SwaggerOpenApi;
@@ -8,10 +10,20 @@ class OpenApiFactory
 {
     public function __construct(
         protected SpecificationObjectSerializer $serializer,
-        protected SchemaNormalizer $schemaNormalizer
+        protected SchemaNormalizer $schemaNormalizer,
     ) {
     }
 
+    /**
+     * @param array<int, mixed> $servers
+     * @param array<int, mixed> $tags
+     * @param array<int, mixed> $paths
+     * @param array<int, array<string, array<int, string>>> $security
+     * @param array<string, mixed> $extensions
+     * @param SpecVersion $version
+     * @param mixed $info
+     * @param mixed $components
+     */
     public function create(
         SpecVersion $version,
         mixed $info,
@@ -20,7 +32,7 @@ class OpenApiFactory
         array $paths,
         mixed $components,
         array $security,
-        array $extensions
+        array $extensions,
     ): SwaggerOpenApi {
         $properties = [
             'openapi' => $version->value,
@@ -48,6 +60,11 @@ class OpenApiFactory
         return new SwaggerOpenApi($this->schemaNormalizer->normalize($properties, $version));
     }
 
+    /**
+     * @param array<int, mixed> $paths
+     * @param SpecVersion $version
+     * @return array<string, mixed>
+     */
     protected function pathsToArray(array $paths, SpecVersion $version): array
     {
         $serialized = [];
@@ -57,18 +74,24 @@ class OpenApiFactory
             $route = $path['path'] ?? $path['route'] ?? null;
             unset($path['path'], $path['route']);
 
-            $serialized[$route] = $path;
+            if (\is_string($route)) {
+                $serialized[$route] = $path;
+            }
         }
 
         return $serialized;
     }
 
+    /**
+     * @param array<string, mixed> $extensions
+     * @return array<string, mixed>
+     */
     protected function extensionsToArray(array $extensions): array
     {
         $serialized = [];
 
         foreach ($extensions as $key => $value) {
-            $serialized[preg_replace('/^x-/', '', (string) $key)] = $value;
+            $serialized[\preg_replace('/^x-/', '', (string)$key)] = $value;
         }
 
         return $serialized;

@@ -1,5 +1,5 @@
 {
-    "name": "vyuldashev/laravel-openapi",
+    "name": "tartanlegrand/laravel-openapi",
     "description": "Generate OpenAPI Specification for Laravel Applications",
     "keywords": [
         "laravel",
@@ -24,9 +24,13 @@
         "doctrine/dbal": "^3.0",
         "zircote/swagger-php": "^6.1",
         "laravel/framework": "^12.0|^13.0",
-        "phpdocumentor/reflection-docblock": "^6.0"
+        "phpdocumentor/reflection-docblock": "^5.0|^6.0"
     },
     "require-dev": {
+        "driftingly/rector-laravel": "^2.4",
+        "larastan/larastan": "^3.10",
+        "laravel/boost": "^2.4",
+        "laravel/pint": "^1.29",
         "orchestra/testbench": "^10.0|^11.0",
         "phpunit/phpunit": "^12.5"
     },

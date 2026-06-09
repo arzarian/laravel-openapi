@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Console;
 
 use Illuminate\Console\GeneratorCommand;
@@ -11,23 +13,26 @@ class ResponseFactoryMakeCommand extends GeneratorCommand
     protected $description = 'Create a new Response factory class';
     protected $type = 'Response';
 
+    #[\Override]
     protected function buildClass($name)
     {
         $output = parent::buildClass($name);
 
-        return str_replace('DummyResponse', Str::replaceLast('Response', '', class_basename($name)), $output);
+        return \str_replace('DummyResponse', Str::replaceLast('Response', '', class_basename($name)), $output);
     }
 
     protected function getStub(): string
     {
-        return __DIR__.'/stubs/response.stub';
+        return __DIR__ . '/stubs/response.stub';
     }
 
+    #[\Override]
     protected function getDefaultNamespace($rootNamespace): string
     {
-        return $rootNamespace.'\OpenApi\Responses';
+        return $rootNamespace . '\OpenApi\Responses';
     }
 
+    #[\Override]
     protected function qualifyClass($name): string
     {
         $name = parent::qualifyClass($name);
@@ -36,6 +41,6 @@ class ResponseFactoryMakeCommand extends GeneratorCommand
             return $name;
         }
 
-        return $name.'Response';
+        return $name . 'Response';
     }
 }

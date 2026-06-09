@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Tests\Builders;
 
 use OpenApi\Annotations\Components as SwaggerComponents;
 use OpenApi\Annotations\Get;
 use OpenApi\Annotations\Schema as SwaggerSchema;
-use ReflectionMethod;
 use Vyuldashev\LaravelOpenApi\Builders\AllOf;
 use Vyuldashev\LaravelOpenApi\Builders\AnyOf;
 use Vyuldashev\LaravelOpenApi\Attributes\Extension;
@@ -169,8 +170,8 @@ class SpecificationBuildersTest extends TestCase
         $response = Response::ok('ListPets')
             ->content(
                 MediaType::json()->schema(
-                    Schema::array()->items(Schema::ref('#/components/schemas/Pet'))
-                )
+                    Schema::array()->items(Schema::ref('#/components/schemas/Pet')),
+                ),
             );
 
         self::assertSame([
@@ -353,7 +354,7 @@ class SpecificationBuildersTest extends TestCase
                     'type' => 'object',
                 ],
             ],
-        ], json_decode($components->toJson(), true));
+        ], \json_decode($components->toJson(), true));
     }
 
     public function testReferencableFactoriesReturnBuilders(): void
@@ -381,7 +382,7 @@ class SpecificationBuildersTest extends TestCase
 
     public function testSchemaFactoryRefHasConcreteSchemaReturnType(): void
     {
-        $returnType = (new ReflectionMethod(FakeBuilderSchema::class, 'ref'))->getReturnType();
+        $returnType = new \ReflectionMethod(FakeBuilderSchema::class, 'ref')->getReturnType();
 
         self::assertSame(Schema::class, $returnType?->getName());
     }
@@ -392,8 +393,8 @@ class SpecificationBuildersTest extends TestCase
             ->summary('Callback receiver')
             ->requestBody(
                 RequestBody::create()->content(
-                    MediaType::json()->schema(Schema::object()->properties(Schema::string('foo')))
-                )
+                    MediaType::json()->schema(Schema::object()->properties(Schema::string('foo'))),
+                ),
             )
             ->responses(Response::ok()->description('Accepted'));
 
@@ -439,7 +440,7 @@ class SpecificationBuildersTest extends TestCase
 
         self::assertSame([
             'x-schema' => ['type' => 'string', 'format' => 'uuid'],
-        ], json_decode($operation->toJson(), true));
+        ], \json_decode($operation->toJson(), true));
     }
 
     public function testSwaggerPhpAnnotationsStillWorkAsTransitionFallback(): void
@@ -468,7 +469,7 @@ class SpecificationBuildersTest extends TestCase
                     'type' => 'object',
                 ],
             ],
-        ], json_decode($components->toJson(), true));
+        ], \json_decode($components->toJson(), true));
     }
 
     public function testSchemaAdjacentBuildersSerialize(): void

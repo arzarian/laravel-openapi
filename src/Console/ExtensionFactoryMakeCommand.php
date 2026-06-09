@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vyuldashev\LaravelOpenApi\Console;
 
 use Illuminate\Console\GeneratorCommand;
@@ -11,24 +13,27 @@ class ExtensionFactoryMakeCommand extends GeneratorCommand
     protected $description = 'Create a new extension factory class';
     protected $type = 'Extension';
 
+    #[\Override]
     protected function buildClass($name)
     {
         $output = parent::buildClass($name);
-        $output = str_replace('DummyExtension', Str::start(Str::snake(Str::replaceLast('DummyExtension', '', class_basename($name)), '-'), 'x-'), $output);
+        $output = \str_replace('DummyExtension', Str::start(Str::snake(Str::replaceLast('DummyExtension', '', class_basename($name)), '-'), 'x-'), $output);
 
         return $output;
     }
 
     protected function getStub(): string
     {
-        return __DIR__.'/stubs/extension.stub';
+        return __DIR__ . '/stubs/extension.stub';
     }
 
+    #[\Override]
     protected function getDefaultNamespace($rootNamespace): string
     {
-        return $rootNamespace.'\OpenApi\Extensions';
+        return $rootNamespace . '\OpenApi\Extensions';
     }
 
+    #[\Override]
     protected function qualifyClass($name): string
     {
         $name = parent::qualifyClass($name);
@@ -37,6 +42,6 @@ class ExtensionFactoryMakeCommand extends GeneratorCommand
             return $name;
         }
 
-        return $name.'Extension';
+        return $name . 'Extension';
     }
 }
