@@ -49,10 +49,7 @@ class SchemaFactoryMakeCommand extends GeneratorCommand
         $columns = SchemaFacade::connection($model->getConnectionName())->getColumnListing(config('database.connections.'.config('database.default').'.prefix', '').$model->getTable());
         $connection = $model->getConnection();
 
-        $definition = 'return new Schema(['.PHP_EOL;
-        $definition .= '            \'schema\' => \''.class_basename($model).'\','.PHP_EOL;
-        $definition .= '            \'type\' => \'object\','.PHP_EOL;
-        $definition .= '            \'properties\' => ['.PHP_EOL;
+        $definition = 'return Schema::object(\''.class_basename($model).'\')->properties('.PHP_EOL;
 
         $properties = collect($columns)
             ->map(static function ($column) use ($model, $connection) {
@@ -64,27 +61,27 @@ class SchemaFactoryMakeCommand extends GeneratorCommand
 
                 switch (get_class($column->getType())) {
                     case IntegerType::class:
-                        $format = 'new Property([\'property\' => %s, \'type\' => \'integer\', \'default\' => %s])';
+                        $format = 'Schema::integer(%s)->default(%s)';
                         $args = [$name, $notNull ? (int) $default : null];
                         break;
                     case BooleanType::class:
-                        $format = 'new Property([\'property\' => %s, \'type\' => \'boolean\', \'default\' => %s])';
+                        $format = 'Schema::boolean(%s)->default(%s)';
                         $args = [$name, $notNull ? $default : null];
                         break;
                     case DateType::class:
-                        $format = 'new Property([\'property\' => %s, \'type\' => \'string\', \'format\' => \'date\', \'default\' => %s])';
+                        $format = 'Schema::string(%s)->format(Schema::FORMAT_DATE)->default(%s)';
                         $args = [$name, $notNull ? $default : null];
                         break;
                     case DateTimeType::class:
-                        $format = 'new Property([\'property\' => %s, \'type\' => \'string\', \'format\' => \'date-time\', \'default\' => %s])';
+                        $format = 'Schema::string(%s)->format(Schema::FORMAT_DATE_TIME)->default(%s)';
                         $args = [$name, $notNull ? $default : null];
                         break;
                     case DecimalType::class:
-                        $format = 'new Property([\'property\' => %s, \'type\' => \'number\', \'format\' => \'float\', \'default\' => %s])';
+                        $format = 'Schema::number(%s)->format(Schema::FORMAT_FLOAT)->default(%s)';
                         $args = [$name, $notNull ? (float) $default : null];
                         break;
                     default:
-                        $format = 'new Property([\'property\' => %s, \'type\' => \'string\', \'default\' => %s])';
+                        $format = 'Schema::string(%s)->default(%s)';
                         $args = [$name, $default];
                         break;
                 }
@@ -108,8 +105,7 @@ class SchemaFactoryMakeCommand extends GeneratorCommand
             ->implode(','.PHP_EOL);
 
         $definition .= $properties.PHP_EOL;
-        $definition .= '            ],'.PHP_EOL;
-        $definition .= '        ]);';
+        $definition .= '        )';
 
         return str_replace('DummyDefinition', $definition, $output);
     }

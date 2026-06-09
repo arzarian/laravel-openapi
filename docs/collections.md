@@ -72,7 +72,7 @@ Custom controller:
 
 namespace App\OpenApi;
 
-use GoldSpecDigital\ObjectOrientedOAS\OpenApi;
+use OpenApi\Annotations\OpenApi;
 use Vyuldashev\LaravelOpenApi\Generator;
 
 class OpenApiController
@@ -119,4 +119,3 @@ The below example will generate the OpenAPI spec for a collection named 'v1', if
 ```
 php artisan openapi:generate v1
 ```
-

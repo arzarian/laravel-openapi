@@ -2,15 +2,15 @@
 
 namespace Vyuldashev\LaravelOpenApi\Factories;
 
-use OpenApi\Annotations\Parameter;
 use Vyuldashev\LaravelOpenApi\Concerns\Referencable;
+use Vyuldashev\LaravelOpenApi\Builders\Parameter as ParameterBuilder;
 
 abstract class ParametersFactory
 {
     use Referencable;
 
     /**
-     * @return Parameter[]
+     * @return array<ParameterBuilder|\OpenApi\Annotations\Parameter|array>
      */
     abstract public function build(): array;
 }

@@ -2,12 +2,15 @@
 
 namespace Vyuldashev\LaravelOpenApi\Factories;
 
-use OpenApi\Annotations\Response;
 use Vyuldashev\LaravelOpenApi\Concerns\Referencable;
+use Vyuldashev\LaravelOpenApi\Builders\Response as ResponseBuilder;
 
 abstract class ResponseFactory
 {
     use Referencable;
 
-    abstract public function build(): Response;
+    /**
+     * @return ResponseBuilder|\OpenApi\Annotations\Response|array
+     */
+    abstract public function build();
 }

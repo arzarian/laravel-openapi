@@ -3,12 +3,12 @@
 namespace Vyuldashev\LaravelOpenApi\Concerns;
 
 use InvalidArgumentException;
-use OpenApi\Annotations\AbstractAnnotation;
-use OpenApi\Annotations\Parameter;
-use OpenApi\Annotations\RequestBody;
-use OpenApi\Annotations\Response;
-use OpenApi\Annotations\Schema;
-use OpenApi\Annotations\SecurityScheme;
+use Vyuldashev\LaravelOpenApi\Builders\Parameter;
+use Vyuldashev\LaravelOpenApi\Builders\RequestBody;
+use Vyuldashev\LaravelOpenApi\Builders\Response;
+use Vyuldashev\LaravelOpenApi\Builders\Schema;
+use Vyuldashev\LaravelOpenApi\Builders\SecurityScheme;
+use Vyuldashev\LaravelOpenApi\Builders\SpecificationBuilder;
 use Vyuldashev\LaravelOpenApi\Contracts\Reusable;
 use Vyuldashev\LaravelOpenApi\Factories\CallbackFactory;
 use Vyuldashev\LaravelOpenApi\Factories\ParametersFactory;
@@ -20,7 +20,7 @@ use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecificationObjectSerializer;
 
 trait Referencable
 {
-    public static function ref(?string $objectId = null): AbstractAnnotation|array
+    public static function ref(?string $objectId = null): SpecificationBuilder|array
     {
         $instance = app(static::class);
 
@@ -55,12 +55,12 @@ trait Referencable
         $ref = $baseRef.$name;
 
         return match (true) {
-            $instance instanceof ParametersFactory => new Parameter(['ref' => $ref, 'parameter' => $objectId]),
-            $instance instanceof RequestBodyFactory => new RequestBody(['ref' => $ref, 'request' => $objectId]),
-            $instance instanceof ResponseFactory => new Response(['ref' => $ref, 'response' => $objectId]),
-            $instance instanceof SecuritySchemeFactory => new SecurityScheme(['ref' => $ref, 'securityScheme' => $objectId]),
+            $instance instanceof ParametersFactory => Parameter::ref($ref, $objectId),
+            $instance instanceof RequestBodyFactory => RequestBody::ref($ref, $objectId),
+            $instance instanceof ResponseFactory => Response::ref($ref, $objectId),
+            $instance instanceof SecuritySchemeFactory => SecurityScheme::ref($ref, $objectId),
             $instance instanceof CallbackFactory => ['$ref' => $ref],
-            default => new Schema(['ref' => $ref, 'schema' => $objectId]),
+            default => Schema::ref($ref, $objectId),
         };
     }
 }

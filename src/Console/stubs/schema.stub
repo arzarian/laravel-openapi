@@ -2,23 +2,15 @@
 
 namespace DummyNamespace;
 
-use OpenApi\Annotations\Property;
-use OpenApi\Annotations\Schema;
+use Vyuldashev\LaravelOpenApi\Builders\Schema;
 use Vyuldashev\LaravelOpenApi\Factories\SchemaFactory;
 
 class DummyClass extends SchemaFactory
 {
-    public function build(): Schema
+    public function build()
     {
-        return new Schema([
-            'schema' => 'DummySchema',
-            'type' => 'object',
-            'properties' => [
-                new Property([
-                    'property' => 'foo',
-                    'type' => 'string',
-                ]),
-            ],
-        ]);
+        return Schema::object('DummySchema')->properties(
+            Schema::string('foo'),
+        );
     }
 }

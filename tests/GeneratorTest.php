@@ -1,8 +1,8 @@
 <?php
 
-namespace Vyuldashev\LaravelOpenApi\Tests;
+declare(strict_types=1);
 
-use InvalidArgumentException;
+namespace Vyuldashev\LaravelOpenApi\Tests;
 
 class GeneratorTest extends TestCase
 {
@@ -24,9 +24,81 @@ class GeneratorTest extends TestCase
     {
         config()->set('openapi.collections.default.openapi', '3.2.0');
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unsupported OpenAPI version [3.2.0]. Supported versions: 3.0.x, 3.1.x.');
 
         $this->generate();
+    }
+
+    public function testOpenApi30GeneratesValidSchemaRefSiblingFallback(): void
+    {
+        config()->set('openapi.collections.default.openapi', '3.0.4');
+        config()->set('openapi.locations.schemas', [
+            __DIR__ . '/Fixtures/OpenApi/Schemas',
+        ]);
+
+        $spec = $this->generateArray();
+
+        self::assertSame([
+            'allOf' => [
+                ['$ref' => '#/components/schemas/RefSiblingItem'],
+            ],
+            'description' => 'Description',
+            'nullable' => true,
+            'deprecated' => true,
+        ], $spec['components']['schemas']['RefSiblingWrapper']['properties']['refItem']);
+    }
+
+    public function testOpenApi31GeneratesNullableSchemaRefSiblingAnyOf(): void
+    {
+        config()->set('openapi.collections.default.openapi', '3.1.2');
+        config()->set('openapi.locations.schemas', [
+            __DIR__ . '/Fixtures/OpenApi/Schemas',
+        ]);
+
+        $spec = $this->generateArray();
+
+        self::assertSame([
+            'anyOf' => [
+                ['$ref' => '#/components/schemas/RefSiblingItem'],
+                ['type' => 'null'],
+            ],
+            'description' => 'Description',
+            'deprecated' => true,
+        ], $spec['components']['schemas']['RefSiblingWrapper']['properties']['refItem']);
+    }
+
+    public function testReusableSchemaKeepsPropertyNamedTypeAsSchemaObject(): void
+    {
+        // Verifies schema property maps survive swagger-php annotation serialization.
+        config()->set('openapi.locations.schemas', [
+            __DIR__ . '/Fixtures/OpenApi/Schemas',
+        ]);
+
+        $spec = $this->generateArray();
+
+        self::assertSame([
+            'required' => [
+                'type',
+                'title',
+            ],
+            'properties' => [
+                'type' => [
+                    'description' => 'Тип',
+                    'type' => 'string',
+                    'enum' => [
+                        'type1',
+                        'type2',
+                        'type3',
+                    ],
+                ],
+                'title' => [
+                    'description' => 'Заголовок',
+                    'type' => 'string',
+                    'example' => 'Заголовок',
+                ],
+            ],
+            'type' => 'object',
+        ], $spec['components']['schemas']['NamedTypeProperty']);
     }
 }

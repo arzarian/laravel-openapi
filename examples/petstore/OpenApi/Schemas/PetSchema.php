@@ -2,34 +2,20 @@
 
 namespace Examples\Petstore\OpenApi\Schemas;
 
-use OpenApi\Annotations\Property;
-use OpenApi\Annotations\Schema;
+use Vyuldashev\LaravelOpenApi\Builders\Schema;
 use Vyuldashev\LaravelOpenApi\Contracts\Reusable;
 use Vyuldashev\LaravelOpenApi\Factories\SchemaFactory;
 
 class PetSchema extends SchemaFactory implements Reusable
 {
-    public function build(): Schema
+    public function build()
     {
-        return new Schema([
-            'schema' => 'Pet',
-            'type' => 'object',
-            'required' => ['id', 'name'],
-            'properties' => [
-                new Property([
-                    'property' => 'id',
-                    'format' => 'int64',
-                    'type' => 'integer',
-                ]),
-                new Property([
-                    'property' => 'name',
-                    'type' => 'string',
-                ]),
-                new Property([
-                    'property' => 'tag',
-                    'type' => 'string',
-                ]),
-            ],
-        ]);
+        return Schema::object('Pet')
+            ->required('id', 'name')
+            ->properties(
+                Schema::integer('id')->format(Schema::FORMAT_INT64),
+                Schema::string('name'),
+                Schema::string('tag'),
+            );
     }
 }

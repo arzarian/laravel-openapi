@@ -22,7 +22,6 @@
         "php": "^8.4",
         "ext-json": "*",
         "doctrine/dbal": "^3.0",
-        "goldspecdigital/oooas": "^2.7.1",
         "zircote/swagger-php": "^6.1",
         "laravel/framework": "^12.0|^13.0",
         "phpdocumentor/reflection-docblock": "^6.0"

@@ -2,12 +2,15 @@
 
 namespace Vyuldashev\LaravelOpenApi\Factories;
 
-use OpenApi\Annotations\RequestBody;
 use Vyuldashev\LaravelOpenApi\Concerns\Referencable;
+use Vyuldashev\LaravelOpenApi\Builders\RequestBody as RequestBodyBuilder;
 
 abstract class RequestBodyFactory
 {
     use Referencable;
 
-    abstract public function build(): RequestBody;
+    /**
+     * @return RequestBodyBuilder|\OpenApi\Annotations\RequestBody|array
+     */
+    abstract public function build();
 }

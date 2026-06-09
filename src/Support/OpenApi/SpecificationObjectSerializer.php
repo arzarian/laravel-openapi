@@ -36,8 +36,16 @@ class SpecificationObjectSerializer
         );
     }
 
-    public function property(object $object, string $property): mixed
+    public function property(mixed $object, string $property): mixed
     {
+        if (is_array($object)) {
+            return $object[$property] ?? $object['objectId'] ?? null;
+        }
+
+        if (! is_object($object)) {
+            return null;
+        }
+
         try {
             $value = $object->{$property};
 
@@ -47,7 +55,7 @@ class SpecificationObjectSerializer
         }
     }
 
-    public function componentName(object $object, string $keyField): ?string
+    public function componentName(mixed $object, string $keyField): ?string
     {
         return $this->property($object, $keyField) ?? $this->property($object, 'objectId');
     }

@@ -2,12 +2,15 @@
 
 namespace Vyuldashev\LaravelOpenApi\Factories;
 
-use OpenApi\Annotations\Schema;
 use Vyuldashev\LaravelOpenApi\Concerns\Referencable;
+use Vyuldashev\LaravelOpenApi\Builders\Schema as SchemaBuilder;
 
 abstract class SchemaFactory
 {
     use Referencable;
 
-    abstract public function build(): Schema;
+    /**
+     * @return SchemaBuilder|\OpenApi\Annotations\Schema|array
+     */
+    abstract public function build();
 }

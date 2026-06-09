@@ -2,9 +2,12 @@
 
 namespace Vyuldashev\LaravelOpenApi\Factories;
 
-use OpenApi\Annotations\Server;
+use Vyuldashev\LaravelOpenApi\Builders\Server as ServerBuilder;
 
 abstract class ServerFactory
 {
-    abstract public function build(): Server;
+    /**
+     * @return ServerBuilder|\OpenApi\Annotations\Server|array
+     */
+    abstract public function build();
 }

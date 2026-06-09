@@ -2,8 +2,8 @@
 
 namespace Examples\Petstore\OpenApi\Parameters;
 
-use OpenApi\Annotations\Parameter;
-use OpenApi\Annotations\Schema;
+use Vyuldashev\LaravelOpenApi\Builders\Parameter;
+use Vyuldashev\LaravelOpenApi\Builders\Schema;
 use Vyuldashev\LaravelOpenApi\Factories\ParametersFactory;
 
 class ListPetsParameters extends ParametersFactory
@@ -15,16 +15,11 @@ class ListPetsParameters extends ParametersFactory
     {
         return [
 
-            new Parameter([
-                'name' => 'limit',
-                'in' => 'query',
-                'description' => 'How many items to return at one time (max 100)',
-                'required' => false,
-                'schema' => new Schema([
-                    'format' => 'int32',
-                    'type' => 'integer',
-                ]),
-            ]),
+            Parameter::query()
+                ->name('limit')
+                ->description('How many items to return at one time (max 100)')
+                ->required(false)
+                ->schema(Schema::integer()->format(Schema::FORMAT_INT32)),
 
         ];
     }

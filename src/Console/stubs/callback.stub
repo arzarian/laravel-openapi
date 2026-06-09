@@ -2,50 +2,39 @@
 
 namespace DummyNamespace;
 
-use OpenApi\Annotations\MediaType;
-use OpenApi\Annotations\PathItem;
-use OpenApi\Annotations\Post;
-use OpenApi\Annotations\Property;
-use OpenApi\Annotations\RequestBody;
-use OpenApi\Annotations\Response;
-use OpenApi\Annotations\Schema;
+use Vyuldashev\LaravelOpenApi\Builders\Callback;
+use Vyuldashev\LaravelOpenApi\Builders\MediaType;
+use Vyuldashev\LaravelOpenApi\Builders\Operation;
+use Vyuldashev\LaravelOpenApi\Builders\PathItem;
+use Vyuldashev\LaravelOpenApi\Builders\RequestBody;
+use Vyuldashev\LaravelOpenApi\Builders\Response;
+use Vyuldashev\LaravelOpenApi\Builders\Schema;
 use Vyuldashev\LaravelOpenApi\Factories\CallbackFactory;
-use Vyuldashev\LaravelOpenApi\Support\OpenApi\CallbackDefinition;
 
 class DummyClass extends CallbackFactory
 {
-    public function build(): CallbackDefinition
+    public function build()
     {
-        return new CallbackDefinition(
-            'MyEvent',
-            '{$request.body#/callbackUrl}',
-            new PathItem([
-                'post' => new Post([
-                    'requestBody' => new RequestBody([
-                        'description' => 'something happened',
-                        'content' => [
-                            new MediaType([
-                                'mediaType' => 'application/json',
-                                'schema' => new Schema([
-                                    'type' => 'object',
-                                    'properties' => [
-                                        new Property([
-                                            'property' => 'foo',
-                                            'type' => 'string',
-                                        ]),
-                                    ],
-                                ]),
-                            ]),
-                        ],
-                    ]),
-                    'responses' => [
-                        new Response([
-                            'response' => 200,
-                            'description' => 'Your server returns this code if it accepts the callback',
-                        ]),
-                    ],
-                ]),
-            ])
-        );
+        return Callback::create('MyEvent')
+            ->expression(
+                '{$request.body#/callbackUrl}',
+                PathItem::create()->post(
+                    Operation::post()
+                        ->requestBody(
+                            RequestBody::create()
+                                ->description('something happened')
+                                ->content(
+                                    MediaType::json()->schema(
+                                        Schema::object()->properties(
+                                            Schema::string('foo'),
+                                        )
+                                    )
+                                )
+                        )
+                        ->responses(
+                            Response::ok()->description('Your server returns this code if it accepts the callback')
+                        )
+                )
+            );
     }
 }

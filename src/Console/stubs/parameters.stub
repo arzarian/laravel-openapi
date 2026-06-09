@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DummyNamespace;
 
-use OpenApi\Annotations\Parameter;
-use OpenApi\Annotations\Schema;
+use Vyuldashev\LaravelOpenApi\Builders\Parameter;
+use Vyuldashev\LaravelOpenApi\Builders\Schema;
 use Vyuldashev\LaravelOpenApi\Factories\ParametersFactory;
 
 class DummyClass extends ParametersFactory
@@ -15,15 +17,11 @@ class DummyClass extends ParametersFactory
     {
         return [
 
-            new Parameter([
-                'name' => 'parameter-name',
-                'in' => 'query',
-                'description' => 'Parameter description',
-                'required' => false,
-                'schema' => new Schema([
-                    'type' => 'string',
-                ]),
-            ]),
+            Parameter::query()
+                ->name('parameter-name')
+                ->description('Parameter description')
+                ->required(false)
+                ->schema(Schema::string()),
 
         ];
     }
