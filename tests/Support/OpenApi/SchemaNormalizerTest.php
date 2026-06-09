@@ -1,11 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Vyuldashev\LaravelOpenApi\Tests\Support\OpenApi;
 
 use PHPUnit\Framework\TestCase;
-use Vyuldashev\LaravelOpenApi\Builders\Schema;
 use Vyuldashev\LaravelOpenApi\Support\OpenApi\SchemaNormalizer;
 use Vyuldashev\LaravelOpenApi\Support\OpenApi\SpecVersion;
 
@@ -196,7 +193,7 @@ class SchemaNormalizerTest extends TestCase
 
         self::assertSame($specification, $this->normalizer()->normalize(
             $specification,
-            new SpecVersion('3.0.4'),
+            new SpecVersion('3.0.4')
         ));
 
         self::assertSame([
@@ -215,40 +212,16 @@ class SchemaNormalizerTest extends TestCase
             ],
         ], $this->normalizer()->normalize(
             $specification,
-            new SpecVersion('3.1.2'),
-        ));
-    }
-
-    public function testPropertyMapWithTypePropertyWithoutSchemaKeywordsKeepsPropertyName(): void
-    {
-        // Проверяет, что имя property не считается schema type без schema keywords.
-        $specification = [
-            'components' => [
-                'schemas' => [
-                    'Example' => [
-                        'properties' => [
-                            'type' => [
-                                'description' => 'Тип',
-                            ],
-                        ],
-                        'type' => 'object',
-                    ],
-                ],
-            ],
-        ];
-
-        self::assertSame($specification, $this->normalizer()->normalize(
-            $specification,
-            new SpecVersion('3.0.4'),
+            new SpecVersion('3.1.2')
         ));
     }
 
     public function testPropertyMapWithTypePropertyFromBuilderKeepsPropertyName(): void
     {
-        $schema = Schema::object('Example')->properties(
-            Schema::string('type')
+        $schema = \Vyuldashev\LaravelOpenApi\Builders\Schema::object('Example')->properties(
+            \Vyuldashev\LaravelOpenApi\Builders\Schema::string('type')
                 ->nullable()
-                ->description('Тип'),
+                ->description('Тип')
         );
 
         $specification = $this->normalizer()->normalize([

@@ -4,44 +4,6 @@ namespace Vyuldashev\LaravelOpenApi\Builders;
 
 use OpenApi\Annotations\Schema as SwaggerSchema;
 
-/**
- * @property-read ?string $schema
- * @property-read ?string $title
- * @property-read ?string $description
- * @property-read list<mixed> $enum
- * @property-read mixed $default
- * @property-read ?string $format
- * @property-read string|list<string>|null $type
- * @property-read mixed $const
- * @property-read mixed $items
- * @property-read ?int $maxItems
- * @property-read ?int $minItems
- * @property-read ?bool $uniqueItems
- * @property-read ?string $pattern
- * @property-read ?int $maxLength
- * @property-read ?int $minLength
- * @property-read int|float|null $maximum
- * @property-read int|float|bool|null $exclusiveMaximum
- * @property-read int|float|null $minimum
- * @property-read int|float|bool|null $exclusiveMinimum
- * @property-read int|float|null $multipleOf
- * @property-read list<mixed> $required
- * @property-read list<mixed> $allOf
- * @property-read list<mixed> $anyOf
- * @property-read list<mixed> $oneOf
- * @property-read mixed $not
- * @property-read mixed $additionalProperties
- * @property-read ?int $maxProperties
- * @property-read ?int $minProperties
- * @property-read ?bool $nullable
- * @property-read mixed $discriminator
- * @property-read ?bool $readOnly
- * @property-read ?bool $writeOnly
- * @property-read mixed $xml
- * @property-read mixed $externalDocs
- * @property-read mixed $example
- * @property-read ?bool $deprecated
- */
 class Schema extends SpecificationBuilder
 {
     public const TYPE_ARRAY = 'array';
@@ -285,6 +247,22 @@ class Schema extends SpecificationBuilder
     public function deprecated(?bool $deprecated = true): static
     {
         return $this->set('deprecated', $deprecated);
+    }
+
+    public function toArray(): array
+    {
+        if ($this->ref === null) {
+            return parent::toArray();
+        }
+
+        $properties = $this->filter($this->build());
+        unset($properties['schema']);
+
+        if ($properties === []) {
+            return ['$ref' => $this->ref];
+        }
+
+        return array_merge(['$ref' => $this->ref], $properties);
     }
 
     protected function build(): array

@@ -5,6 +5,7 @@ namespace Vyuldashev\LaravelOpenApi\Tests\Builders;
 use OpenApi\Annotations\Components as SwaggerComponents;
 use OpenApi\Annotations\Get;
 use OpenApi\Annotations\Schema as SwaggerSchema;
+use ReflectionMethod;
 use Vyuldashev\LaravelOpenApi\Builders\AllOf;
 use Vyuldashev\LaravelOpenApi\Builders\AnyOf;
 use Vyuldashev\LaravelOpenApi\Attributes\Extension;
@@ -108,6 +109,59 @@ class SpecificationBuildersTest extends TestCase
                 'name' => 'result',
             ],
         ], $schema->toArray());
+    }
+
+    public function testSchemaRefKeepsSiblingAttributes(): void
+    {
+        self::assertSame([
+            '$ref' => '#/components/schemas/Item',
+            'description' => 'Description',
+            'deprecated' => true,
+            'x' => ['codegen-request-body-name' => 'item'],
+        ], Schema::ref('#/components/schemas/Item', 'item')
+            ->description('Description')
+            ->deprecated()
+            ->x('codegen-request-body-name', 'item')
+            ->toArray());
+
+        self::assertSame([
+            '$ref' => '#/components/schemas/Item',
+            'nullable' => true,
+        ], Schema::ref('#/components/schemas/Item')
+            ->nullable()
+            ->toArray());
+
+        self::assertSame([
+            '$ref' => '#/components/schemas/Item',
+        ], Schema::ref('#/components/schemas/Item')
+            ->toArray());
+    }
+
+    public function testNonSchemaRefsStayPureReferences(): void
+    {
+        self::assertSame([
+            '$ref' => '#/components/responses/Error',
+        ], Response::ref('#/components/responses/Error')
+            ->description('Ignored')
+            ->toArray());
+
+        self::assertSame([
+            '$ref' => '#/components/parameters/PetId',
+        ], Parameter::ref('#/components/parameters/PetId')
+            ->description('Ignored')
+            ->toArray());
+
+        self::assertSame([
+            '$ref' => '#/components/requestBodies/CreatePet',
+        ], RequestBody::ref('#/components/requestBodies/CreatePet')
+            ->description('Ignored')
+            ->toArray());
+
+        self::assertSame([
+            '$ref' => '#/components/securitySchemes/Bearer',
+        ], SecurityScheme::ref('#/components/securitySchemes/Bearer')
+            ->description('Ignored')
+            ->toArray());
     }
 
     public function testResponseBuilderMapsContentByMediaType(): void
@@ -323,6 +377,13 @@ class SpecificationBuildersTest extends TestCase
                 '422' => ['$ref' => '#/components/responses/ErrorValidation'],
             ],
         ], Operation::get()->responses($response)->toArray());
+    }
+
+    public function testSchemaFactoryRefHasConcreteSchemaReturnType(): void
+    {
+        $returnType = (new ReflectionMethod(FakeBuilderSchema::class, 'ref'))->getReturnType();
+
+        self::assertSame(Schema::class, $returnType?->getName());
     }
 
     public function testOperationPathAndCallbackBuildersKeepFluentApi(): void

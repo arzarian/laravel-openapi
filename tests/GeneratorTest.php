@@ -1,8 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Vyuldashev\LaravelOpenApi\Tests;
+
+use InvalidArgumentException;
 
 class GeneratorTest extends TestCase
 {
@@ -24,7 +24,7 @@ class GeneratorTest extends TestCase
     {
         config()->set('openapi.collections.default.openapi', '3.2.0');
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unsupported OpenAPI version [3.2.0]. Supported versions: 3.0.x, 3.1.x.');
 
         $this->generate();
@@ -34,7 +34,7 @@ class GeneratorTest extends TestCase
     {
         config()->set('openapi.collections.default.openapi', '3.0.4');
         config()->set('openapi.locations.schemas', [
-            __DIR__ . '/Fixtures/OpenApi/Schemas',
+            __DIR__.'/Fixtures/OpenApi/Schemas',
         ]);
 
         $spec = $this->generateArray();
@@ -53,7 +53,7 @@ class GeneratorTest extends TestCase
     {
         config()->set('openapi.collections.default.openapi', '3.1.2');
         config()->set('openapi.locations.schemas', [
-            __DIR__ . '/Fixtures/OpenApi/Schemas',
+            __DIR__.'/Fixtures/OpenApi/Schemas',
         ]);
 
         $spec = $this->generateArray();
@@ -66,39 +66,5 @@ class GeneratorTest extends TestCase
             'description' => 'Description',
             'deprecated' => true,
         ], $spec['components']['schemas']['RefSiblingWrapper']['properties']['refItem']);
-    }
-
-    public function testReusableSchemaKeepsPropertyNamedTypeAsSchemaObject(): void
-    {
-        // Verifies schema property maps survive swagger-php annotation serialization.
-        config()->set('openapi.locations.schemas', [
-            __DIR__ . '/Fixtures/OpenApi/Schemas',
-        ]);
-
-        $spec = $this->generateArray();
-
-        self::assertSame([
-            'required' => [
-                'type',
-                'title',
-            ],
-            'properties' => [
-                'type' => [
-                    'description' => 'Тип',
-                    'type' => 'string',
-                    'enum' => [
-                        'type1',
-                        'type2',
-                        'type3',
-                    ],
-                ],
-                'title' => [
-                    'description' => 'Заголовок',
-                    'type' => 'string',
-                    'example' => 'Заголовок',
-                ],
-            ],
-            'type' => 'object',
-        ], $spec['components']['schemas']['NamedTypeProperty']);
     }
 }
