@@ -21,12 +21,17 @@ module.exports = {
           '/paths/parameters',
           '/paths/request-bodies',
           '/paths/responses',
+          '/paths/callbacks',
         ],
       },
+      '/configuration',
       '/schemas',
+      '/components',
       '/collections',
       '/middlewares',
-      '/security'
+      '/security',
+      '/extensions',
+      '/migration'
     ],
     displayAllHeaders: true,
     sidebarDepth: 2,

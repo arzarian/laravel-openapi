@@ -28,9 +28,14 @@ php artisan vendor:publish --provider="Vyuldashev\LaravelOpenApi\OpenApiServiceP
 Before starting using this package you need to be familiar with OpenAPI specification and it's terms.
 
 Here are some useful links that will help to gain enough knowledge:
-* [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md)
+* [OpenAPI Specification](https://github.com/OAI/OpenAPI-Specification)
 * [OpenAPI Map](https://openapi-map.apihandyman.io)
 * [Swagger Editor](https://editor.swagger.io/)
+
+## Supported versions
+
+This package supports OpenAPI `3.0.x` and `3.1.x` documents.
+It supports Laravel 12 and Laravel 13 on PHP 8.4+.
 
 ## Generating OpenAPI document
 

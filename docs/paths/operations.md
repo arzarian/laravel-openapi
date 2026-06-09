@@ -16,7 +16,7 @@ class UserController extends Controller
      *
      * Creates new user or returns already existing user by email.
      */
-     #[OpenApi\Operation]
+    #[OpenApi\Operation]
     public function store(Request $request)
     {
         //
@@ -41,7 +41,7 @@ The following definition will be generated:
 
 ## Security
 
-See [Security](../security.md#operation-level-example)
+See [Security](../security.md#operation-level-security).
 
 ## Tags
 
@@ -83,13 +83,62 @@ class UserController extends Controller
      *
      * Creates new user or returns already existing user by email.
      */
-     #[OpenApi\Operation(tags: ['user'])]
+    #[OpenApi\Operation(tags: ['user'])]
     public function store(Request $request)
     {
         //
     }
 }
 ```
+
+## Manual Operation Builders
+
+Use operation builders when you need to assemble an operation manually:
+
+```php
+use Vyuldashev\LaravelOpenApi\Builders\ExternalDocs;
+use Vyuldashev\LaravelOpenApi\Builders\Operation;
+use Vyuldashev\LaravelOpenApi\Builders\Response;
+use Vyuldashev\LaravelOpenApi\Builders\Server;
+
+return Operation::post()
+    ->summary('Create user')
+    ->description('Creates a user.')
+    ->tags('user')
+    ->externalDocs(
+        ExternalDocs::create()->url('https://example.com/docs/users')
+    )
+    ->servers(
+        Server::create()->url('https://api.example.com')
+    )
+    ->responses(
+        Response::created()->description('Created')
+    );
+```
+
+Available operation constructors are `get()`, `post()`, `put()`, `patch()`, `delete()`, `options()`, `head()`, and `trace()`. Use `action('patch')` to change the HTTP method on an existing builder.
+
+`Operation::responses()`, `parameters()`, `requestBody()`, `callbacks()`, and `servers()` accept package builders. `Operation::security()` accepts OpenAPI security requirement maps, and `noSecurity()` emits an empty operation security override.
+
+## Manual Path Items
+
+Use `PathItem` builders to attach operations to HTTP verbs:
+
+```php
+use Vyuldashev\LaravelOpenApi\Builders\Operation;
+use Vyuldashev\LaravelOpenApi\Builders\PathItem;
+use Vyuldashev\LaravelOpenApi\Builders\Response;
+
+return PathItem::create()
+    ->route('/users')
+    ->summary('Users')
+    ->description('User operations')
+    ->post(
+        Operation::post()->responses(Response::created())
+    );
+```
+
+`PathItem` supports `get()`, `post()`, `put()`, `patch()`, `delete()`, `options()`, `head()`, and `trace()`.
 
 ## Resource Controllers and Multiple HTTP Verbs
 

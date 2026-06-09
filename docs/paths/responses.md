@@ -18,6 +18,8 @@ class ListUsersResponse extends ResponseFactory
 }
 ```
 
+`ResponseFactory::build()` must return a `Response` builder. Response content, headers, and links also use package builders, for example `Response::ok()->content(MediaType::json()->schema(Schema::object()))`.
+
 Finally, add `Response` attribute with factory name to your route:
 
 ```php
@@ -67,6 +69,8 @@ class ErrorValidationResponse extends ResponseFactory implements Reusable
 }
 ```
 
+Do not return raw response arrays from response factories and do not pass raw arrays to `Response::content()`.
+
 And in controller's method:
 
 ```php
@@ -113,4 +117,85 @@ class UserController extends Controller
         //
     }
 }
+```
+
+## Content Media Types
+
+Response content is grouped by media type. Use `MediaType` builders:
+
+```php
+use Vyuldashev\LaravelOpenApi\Builders\MediaType;
+use Vyuldashev\LaravelOpenApi\Builders\Response;
+use Vyuldashev\LaravelOpenApi\Builders\Schema;
+
+return Response::ok()
+    ->description('Pet list')
+    ->content(
+        MediaType::json()->schema(
+            Schema::array()->items(PetSchema::ref()),
+        ),
+    );
+```
+
+For files, use the matching media type and a binary string schema:
+
+```php
+return Response::ok()
+    ->description('PDF report')
+    ->content(
+        MediaType::pdf()->schema(
+            Schema::string()->format(Schema::FORMAT_BINARY),
+        ),
+    );
+```
+
+Available media type shortcuts include `json()`, `pdf()`, `jpeg()`, `png()`, `calendar()`, `plainText()`, `xml()`, and `formUrlEncoded()`.
+
+## Headers
+
+Use `Header` builders for response headers:
+
+```php
+use Vyuldashev\LaravelOpenApi\Builders\Header;
+
+return Response::ok()
+    ->headers(
+        Header::create('X-Rate-Limit')->schema(Schema::integer()),
+    );
+```
+
+## Examples
+
+Use `Example` builders when a media type has named examples:
+
+```php
+use Vyuldashev\LaravelOpenApi\Builders\Example;
+
+return Response::ok()
+    ->content(
+        MediaType::json()
+            ->schema(PetSchema::ref())
+            ->examples(
+                Example::create('PetExample')
+                    ->summary('Pet')
+                    ->value(['id' => 1, 'name' => 'Rex']),
+            ),
+    );
+```
+
+`Example` supports `summary()`, `description()`, `value()`, and `externalValue()`.
+
+## Links
+
+Use `Link` builders to describe follow-up operations:
+
+```php
+use Vyuldashev\LaravelOpenApi\Builders\Link;
+
+return Response::ok()
+    ->links(
+        Link::create('GetUser')
+            ->operationId('getUser')
+            ->parameters(['id' => '$response.body#/id']),
+    );
 ```

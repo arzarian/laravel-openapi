@@ -9,6 +9,10 @@
 
 You'll find the documentation on https://vyuldashev.github.io/laravel-openapi.
 
+## Support
+
+This package generates OpenAPI 3.0.x and 3.1.x documents for Laravel 12/13 on PHP 8.4+.
+
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.

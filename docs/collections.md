@@ -6,45 +6,49 @@ The openapi.php config file contains a single collection configuration by defaul
 
 Additional collection configurations may be added to the collections array, the key of the entry represents the name of the collection.
 
-Where Schemas should belong to specific collections, the 'Collection' annotation can be added to the class definition, with a name value matching the collection name e.g.
+Where schemas should belong to specific collections, add the `Collection` attribute to the class definition with a name matching the collection name.
 
 ```php
+<?php
+
+declare(strict_types=1);
+
 namespace App\OpenApi\V1\Schemas;
 
-use Vyuldashev\LaravelOpenApi\Factories\SchemaFactory;
+use Vyuldashev\LaravelOpenApi\Attributes as OpenApi;
+use Vyuldashev\LaravelOpenApi\Builders\Schema;
 use Vyuldashev\LaravelOpenApi\Contracts\Reusable;
-use Vyuldashev\LaravelOpenApi\Annotations as OpenApi;
+use Vyuldashev\LaravelOpenApi\Factories\SchemaFactory;
 
-/**
- * @OpenApi\Collection(name = "v1")
- **/
+#[OpenApi\Collection('v1')]
 class QuoteOfferSchema extends SchemaFactory implements Reusable
 {
-    ...
+    public function build(): Schema
+    {
+        return Schema::object('QuoteOffer');
+    }
 }
 ```
 
-Controller methods can also be assigned to a collection using the 'Collection' annotation.
+Controller methods can also be assigned to a collection using the `Collection` attribute.
 
 ```php
+<?php
+
+declare(strict_types=1);
+
 namespace App\Api\V1\Controllers;
 
-use Vyuldashev\LaravelOpenApi\Annotations as OpenApi;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Vyuldashev\LaravelOpenApi\Attributes as OpenApi;
 
-/**
- * @OpenApi\Collection(name = "v1")
- **/
+#[OpenApi\Collection('v1')]
 class DemoController extends Controller
 {
-    /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     *
-     * @OpenApi\Collection(name="v1")
-     * @OpenApi\Operation(tags="demo")
-     * @OpenApi\Response(factory="App\OpenApi\V1\Responses\DemoResponse", statusCode=200)
-     */
+    #[OpenApi\Collection('v1')]
+    #[OpenApi\Operation(tags: ['demo'])]
+    #[OpenApi\Response(factory: \App\OpenApi\V1\Responses\DemoResponse::class, statusCode: 200)]
     public function create(Request $request): JsonResponse
     {
         ...
@@ -54,60 +58,17 @@ class DemoController extends Controller
 
 ## Web
 
-To permit web UI routing to resolve specific collection documentation, it is necessary to override this package's provided OpenApiController and provide the generator's generate method with the collection name.
-
-One way of doing this is by using named route parameters, setting the opeanapi.php config collection's routes like so:
+Each collection route registered in `openapi.php` generates that collection's specification automatically:
 
 ```php
-  'route' => [
-      'uri' => '/openapi/{collection}',
-      'middleware' => [...],
-  ],
-```
-
-Custom controller:
-
-```php
-<?php
-
-namespace App\OpenApi;
-
-use OpenApi\Annotations\OpenApi;
-use Vyuldashev\LaravelOpenApi\Generator;
-
-class OpenApiController
-{
-    public function show(Generator $generator, string $collection): OpenApi
-    {
-        return $generator->generate($collection);
-    }
-}
-```
-
-You will then need to bind this controller in the register method of a service provider like so:
-
-```php
-<?php
-
-namespace App\Providers;
-
-use App\OpenApi\OpenApiController as CustomOpenApiController;
-use Illuminate\Support\ServiceProvider;
-use Vyuldashev\LaravelOpenApi\Http\OpenApiController;
-
-class AppServiceProvider extends ServiceProvider
-{
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        $this->app->bind(OpenApiController::class, function ($app) {
-            return $app->make(CustomOpenApiController::class);
-        });
-    }
+'collections' => [
+    'default' => [
+        'route' => ['uri' => '/openapi'],
+    ],
+    'v1' => [
+        'route' => ['uri' => '/openapi/v1'],
+    ],
+],
 ```
 
 ## CLI

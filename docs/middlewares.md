@@ -12,7 +12,7 @@ Available lifecycle points are:
 
 ### Component
 
-To add a path middleware create a class that implements `\Vyuldashev\LaravelOpenApi\Contracts\ComponentMiddleware` then register it by referencing it in the  `openapi.collections.default.middlewares.components` config array like `MyComponentMiddleware::class`
+To add a component middleware create a class that implements `\Vyuldashev\LaravelOpenApi\Contracts\ComponentMiddleware` then register it by referencing it in the  `openapi.collections.default.middlewares.components` config array like `MyComponentMiddleware::class`
 
 Available lifecycle points are:
 - `after` - after the `Components` has been built.

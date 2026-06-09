@@ -223,3 +223,34 @@ public function build(): Schema
     return Schema::object('User');
 }
 ```
+
+Use these return contracts for OpenAPI object factories:
+
+| Factory | Return type |
+| --- | --- |
+| `SchemaFactory` | `Schema` |
+| `ResponseFactory` | `Response` |
+| `RequestBodyFactory` | `RequestBody` |
+| `ParameterFactory` | `Parameter` |
+| `ParametersFactory` | `array<int, Parameter>` |
+| `SecuritySchemeFactory` | `SecurityScheme` |
+| `ServerFactory` | `Server` |
+| `CallbackFactory` | `Callback|CallbackDefinition` |
+
+Factories should return package builders. Do not return raw OpenAPI object arrays or `OpenApi\Annotations\*` instances from these factories.
+
+## Builder type safety
+
+Nested OpenAPI objects are typed to package builders. Pass builders to builders:
+
+```php
+Response::ok()->content(
+    MediaType::json()->schema(
+        Schema::object('User')->properties(
+            Schema::string('name'),
+        ),
+    ),
+);
+```
+
+Do not pass raw arrays or `OpenApi\Annotations\*` instances to builder setters. Values that are arbitrary JSON by OpenAPI design stay broad, for example `Schema::example()`, `Schema::default()`, `Schema::enum()`, `Link::requestBody()`, `Operation::security()`, and `Link::parameters()`.

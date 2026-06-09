@@ -20,23 +20,23 @@ Here is an example of `Parameters` object factory:
 class ListUsersParameters extends ParametersFactory
 {
     /**
-     * @return Parameter[]
+     * @return array<int, Parameter>
      */
     public function build(): array
     {
         return [
-
             Parameter::query()
                 ->name('withTrashed')
                 ->description('Display trashed users too')
                 ->required(false)
                 ->schema(Schema::boolean()),
-
         ];
     }
 }
 
 ```
+
+`ParametersFactory::build()` returns a list of `Parameter` builders. Do not return raw parameter arrays or swagger-php annotations.
 
 Finally, add `Parameters` attribute below `Operation` attribute:
 
@@ -117,6 +117,9 @@ Or compose it inside a reusable list:
 ```php
 class MethodParameters extends ParametersFactory implements Reusable
 {
+    /**
+     * @return array<int, Parameter>
+     */
     public function build(): array
     {
         return [
@@ -128,6 +131,8 @@ class MethodParameters extends ParametersFactory implements Reusable
     }
 }
 ```
+
+Parameter schemas are typed. Use `Parameter::query()->schema(Schema::integer())`, not raw schema arrays.
 
 Reusable parameters are added to `components.parameters`. Operations use `$ref` instead of inline parameter definitions.
 
