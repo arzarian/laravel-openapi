@@ -15,8 +15,15 @@ class GenerateCommand extends Command
 
     public function handle(Generator $generator): void
     {
-        $collection = (string)$this->argument('collection');
-        $output = (string)$this->option('output');
+        $collection = $this->argument('collection') ?? 'default';
+        if (!\is_string($collection)) {
+            throw new \InvalidArgumentException('Collection must be a string.');
+        }
+
+        $output = $this->option('output');
+        if ($output !== null && !\is_string($output)) {
+            throw new \InvalidArgumentException('Output must be a string.');
+        }
 
         $collections = Config::get('openapi.collections');
         $collectionExists = \is_array($collections) && collect($collections)->has($collection);

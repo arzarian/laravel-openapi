@@ -40,15 +40,6 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit
 
-      - name: Execute pint
-        run: vendor/bin/pint --test
-
-      - name: Execute phpstan
-        run: vendor/bin/phpstan
-
-      - name: Execute rector
-        run: vendor/bin/rector --dry-run
-
   lints:
     runs-on: ubuntu-latest
 
